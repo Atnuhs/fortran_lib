@@ -1,17 +1,55 @@
-module graph_mod
+module vector_int32_mod
     use,intrinsic :: iso_fortran_env
-    implicit none
-    type node
-        integer(int32),allocatable:: to(:)
+    type vector
+        integer(int32),allocatable:: array(:)
         integer(int32):: l
     contains
-        procedure::  init => node_init
-        procedure:: regist => node_regist
+        procedure :: push_back => vector_regist
     end type
 
+    interface vector
+        module procedure vector_init
+    end interface
+contains
+    function vector_init() result(vec)
+        type(vector):: vec
+        allocate(vec%array(1))
+        vec%l = 0
+    end function
+
+    subroutine vector_regist(vec, v)
+        class(vector):: vec
+        integer(int32):: v
+
+        if (vec%l+1 > size(vec%array)) call add_(vec)
+        vec%l=vec%l+1
+        vec%array(vec%l) = v
+    end subroutine
+
+
+    subroutine add_(vec)
+        type(vector):: vec
+        integer(int32),allocatable:: tmp(:)
+        integer(int32):: l
+
+        l = size(vec%array)
+        allocate(tmp(l))
+        tmp(:) = vec%array(:)
+        deallocate(vec%array)
+        allocate(vec%array(l*2))
+        vec%array(1:l) = tmp(:)
+        deallocate(tmp)
+    end subroutine
+end module
+
+
+module graph_mod
+    use,intrinsic :: iso_fortran_env
+    use vector_int32_mod
+    implicit none
 
     type graph
-        type(node),allocatable:: n(:)
+        type(vector),allocatable:: n(:)
     contains
         procedure:: regist => graph_regist
         procedure:: l => graph_elem_num
@@ -30,7 +68,7 @@ contains
 
         allocate(g%n(n))
         do i=1,n
-            call g%n(i)%init()
+            g%n(i) = vector()
         end do
     end function
 
@@ -39,8 +77,8 @@ contains
         class(graph):: g
         integer(int32):: x,y
 
-        call g%n(x)%regist(y)
-        call g%n(y)%regist(x)
+        call g%n(x)%push_back(y)
+        call g%n(y)%push_back(x)
     end subroutine
 
 
@@ -56,39 +94,6 @@ contains
         class(graph):: g
         integer(int32):: i,j,ret
 
-        ret = g%n(i)%to(j)
+        ret = g%n(i)%array(j)
     end function
-
-
-    subroutine node_init(n)
-        class(node):: n
-        allocate(n%to(1))
-
-        n%l = 0
-    end subroutine
-
-
-    subroutine node_regist(n,m)
-        class(node):: n
-        integer(int32):: m
-
-        if (n%l+1 > size(n%to)) call add_(n)
-        n%l=n%l+1
-        n%to(n%l) = m
-    end subroutine
-
-
-    subroutine add_(n)
-        type(node):: n
-        integer(int32),allocatable:: tmp(:)
-        integer(int32):: l
-
-        l = size(n%to)
-        allocate(tmp(l))
-        tmp(:) = n%to(:)
-        deallocate(n%to)
-        allocate(n%to(l*2))
-        n%to(1:l) = tmp(:)
-        deallocate(tmp)
-    end subroutine
 end module
