@@ -2,7 +2,7 @@ module vector_int32_mod
     use,intrinsic :: iso_fortran_env
     implicit none
     private
-    public:: vec_print, vec_size
+    public:: vec_to_array, vec_size
     type,public:: vector_int32
         integer(int32),pointer:: array(:) => null()
         integer(int32):: l
@@ -71,7 +71,8 @@ contains
 
         vec%l=vec%l+1
         call check_allocation_size(vec)
-        vec%array(i:vec%l) = [v,vec%array(i:vec%l-1)]
+        vec%array(i+1:vec%l+1) = vec%array(i:vec%l)
+        vec%array(i) = v
     end subroutine
 
 
@@ -135,9 +136,9 @@ contains
     end function
 
 
-    subroutine vec_print(vec)
+    function vec_to_array(vec) result(ret)
         type(vector_int32):: vec
-        
-        print'(*(i0,1x))', vec%array(1:vec%l)
-    end subroutine
+        integer(int32):: ret(1:vec%l)
+        ret = vec%array(1:vec%l)
+    end function
 end module
