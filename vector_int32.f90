@@ -3,7 +3,7 @@ module vector_int32_mod
     implicit none
     private
     public:: vec_print, vec_size
-    type,public:: vector
+    type,public:: vector_int32
         integer(int32),pointer:: array(:) => null()
         integer(int32):: l
     contains
@@ -12,19 +12,19 @@ module vector_int32_mod
         procedure:: at=>vec_at, back=>vec_back, head=>vec_head
     end type
 
-    interface vector
+    interface vector_int32
         module procedure vector_init
     end interface
 contains
     function vector_init() result(vec)
-        type(vector):: vec
+        type(vector_int32):: vec
         allocate(vec%array(1))
         vec%l = 0
     end function
 
 
     function vec_size(vec) result(ret)
-        type(vector):: vec
+        type(vector_int32):: vec
         integer(int32):: ret
 
         ret = vec%l
@@ -32,7 +32,7 @@ contains
 
 
     function vec_back(vec) result(ret)
-        class(vector):: vec
+        class(vector_int32):: vec
         integer(int32):: ret
         
         ret = vec%at(vec%l)
@@ -40,7 +40,7 @@ contains
 
 
     function vec_head(vec) result(ret)
-        class(vector):: vec
+        class(vector_int32):: vec
         integer(int32):: ret
         
         ret = vec%at(1)
@@ -48,7 +48,7 @@ contains
 
 
     function vec_at(vec,i) result(ret)
-        class(vector):: vec
+        class(vector_int32):: vec
         integer(int32):: i,ret
         
         ret = vec%array(i)
@@ -56,7 +56,7 @@ contains
 
 
     subroutine vec_push_back(vec, v)
-        class(vector):: vec
+        class(vector_int32):: vec
         integer(int32):: v
 
         vec%l=vec%l+1
@@ -66,7 +66,7 @@ contains
 
 
     subroutine vec_insert(vec,i,v)
-        class(vector):: vec
+        class(vector_int32):: vec
         integer(int32)::i, v
 
         vec%l=vec%l+1
@@ -76,7 +76,7 @@ contains
 
 
     function vec_pop_back(vec) result(ret)
-        class(vector):: vec
+        class(vector_int32):: vec
         integer(int32):: ret
 
         ret = vec%back()
@@ -86,7 +86,7 @@ contains
 
 
     function vec_pop(vec,i) result(ret)
-        class(vector):: vec
+        class(vector_int32):: vec
         integer(int32):: i,ret
 
         ret = vec%at(i)
@@ -97,7 +97,7 @@ contains
 
 
     subroutine vec_erase(vec,i)
-        class(vector):: vec
+        class(vector_int32):: vec
         integer(int32):: i,dmp
 
         dmp = vec%pop(i)
@@ -105,7 +105,7 @@ contains
 
 
     subroutine check_allocation_size(vec)
-        type(vector):: vec
+        type(vector_int32):: vec
 
         if (vec%l > size(vec%array)) then
             vec%array => vec_append_array(vec)
@@ -116,7 +116,7 @@ contains
 
 
     function vec_append_array(vec) result(ret)
-        type(vector):: vec
+        type(vector_int32):: vec
         integer(int32),pointer,dimension(:):: ret
         integer(int32):: l
         
@@ -126,7 +126,7 @@ contains
 
 
     function vec_reduce_array(vec) result(ret)
-        type(vector):: vec
+        type(vector_int32):: vec
         integer(int32),pointer,dimension(:):: ret
         integer(int32):: l
 
@@ -136,7 +136,7 @@ contains
 
 
     subroutine vec_print(vec)
-        type(vector):: vec
+        type(vector_int32):: vec
         
         print'(*(i0,1x))', vec%array(1:vec%l)
     end subroutine
