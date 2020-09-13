@@ -65,7 +65,6 @@ contains
             ret = y
             return
         end if
-    
         ret = gcd(y,mod(x,y))
     end function
 end module

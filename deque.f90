@@ -215,7 +215,6 @@ contains
 
         print'(a)', "This is 'dq_debug_print' => deque_mod"
         print'(a)', "Output the detailed status of the deque."
-
         print'("lmax: ", i5,3x, "rmax: ", i5,3x, "array size: ", i5)', lmax(dq), rmax(dq), size(dq%array)
         print'("lptr: ", i5,3x, "rptr: ", i5,3x, "element num: ", i5)', dq%l, dq%r, dq_size(dq)
         print'("lext: ", i5,3x, "rext: ", i5,3x, "l_half: ", i5)', extra_left(dq), extra_right(dq),size(dq%array)/2
@@ -223,22 +222,3 @@ contains
         print'(*(i0,1x))', (merge(dq%array(i), 0, dq%l+1<=i .and. i<=dq%r-1), i=lmax(dq),rmax(dq))
     end subroutine
 end module
-
-
-program main
-    use,intrinsic :: iso_fortran_env
-    use deque_mod
-    implicit none
-    type(deque):: dq
-    integer(int32):: n,i,tmp
-
-    n=100
-    
-    do i=1,n
-        call dq%append(i)
-        call dq%appendleft(-i)
-        call dq_debug_print(dq)
-    end do
-
-    print'(*(i0,1x))', dq_to_array(dq)
-end program main
