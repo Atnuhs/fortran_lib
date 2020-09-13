@@ -4,7 +4,7 @@ module vector_int32_mod
     private
     public:: vec_to_array, vec_size
     type,public:: vector_int32
-        integer(int32),pointer:: array(:) => null()
+        integer(int32),allocatable:: array(:)
         integer(int32):: l
     contains
         procedure:: push_back=>vec_push_back, insert=>vec_insert
@@ -18,8 +18,8 @@ module vector_int32_mod
 contains
     function vector_init() result(vec)
         type(vector_int32):: vec
+        vec%l=0
         allocate(vec%array(1))
-        vec%l = 0
     end function
 
 
@@ -107,33 +107,37 @@ contains
 
     subroutine check_allocation_size(vec)
         type(vector_int32):: vec
+        integer(int32):: len_alloc
 
-        if (vec%l > size(vec%array)) then
-            vec%array => vec_append_array(vec)
-        else if (vec%l <= size(vec%array)/2) then
-            vec%array => vec_reduce_array(vec)
+        len_alloc = size(vec%array)
+        if (vec%l >= len_alloc) then
+            call vec_append_array(vec,1,len_alloc)
+        else if (vec%l <= len_alloc/2) then
+            call vec_reduce_array(vec,1,len_alloc)
         end if
     end subroutine
 
 
-    function vec_append_array(vec) result(ret)
+    subroutine vec_append_array(vec,l,r)
         type(vector_int32):: vec
-        integer(int32),pointer,dimension(:):: ret
-        integer(int32):: l
+        integer(int32):: l,r
+        integer(int32),allocatable:: tmp(:)
         
-        l=size(vec%array)*2
-        allocate(ret(1:l), source=reshape(vec%array, [l], pad=[0]))
-    end function
+        allocate(tmp(l:2*r))
+        tmp(l:r) = vec%array(l:r)
+        call move_alloc(tmp, vec%array)
+    end subroutine
 
 
-    function vec_reduce_array(vec) result(ret)
+    subroutine vec_reduce_array(vec,l,r)
         type(vector_int32):: vec
-        integer(int32),pointer,dimension(:):: ret
-        integer(int32):: l
-
-        l=size(vec%array)/2
-        allocate(ret(1:l), source=vec%array(1:l))
-    end function
+        integer(int32):: l,r
+        integer(int32),allocatable:: tmp(:)
+        
+        allocate(tmp(l:r/2))
+        tmp(l:r/2) = vec%array(l:r/2)
+        call move_alloc(tmp, vec%array)
+    end subroutine
 
 
     function vec_to_array(vec) result(ret)

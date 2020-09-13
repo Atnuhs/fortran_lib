@@ -1,1 +1,0 @@
-size(vec%array)
