@@ -7,7 +7,7 @@ module deque_mod
 
     type,public:: deque
         integer(int32),allocatable,private:: array(:)
-        integer(int32),private:: l=0,r=1
+        integer(int32),private:: l=1,r=0
     contains
         procedure:: append, appendleft
         procedure:: pop, popleft
@@ -19,6 +19,15 @@ contains
         print'(a)', "you try pop with empty deque"
         stop
     end subroutine
+
+
+    pure function dq_size(dq) result(ret)
+        ! 残りの要素数
+        type(deque),intent(in):: dq
+        integer(int32):: ret
+
+        ret = dq%r-dq%l + 1
+    end function
     
 
     function lmax(dq) result(ret)
@@ -42,8 +51,8 @@ contains
         integer(int32):: l
         integer(int32),allocatable:: tmp(:)
 
-        l = size(dq%array)
-        ! print'("add r :",i0," => ",i0)',rmax(dq),rmax(dq)+l
+        l = dq_size(dq)
+        print'("add r :",i0," => ",i0)',rmax(dq),rmax(dq)+l
         allocate(tmp(lmax(dq):rmax(dq)+l))
         tmp(lmax(dq):rmax(dq)) = dq%array(lmax(dq):rmax(dq))
         call move_alloc(tmp, dq%array)
@@ -55,8 +64,8 @@ contains
         integer(int32):: l
         integer(int32),allocatable:: tmp(:)
 
-        l = size(dq%array)
-        ! print'("add l :",i0," => ",i0)',lmax(dq),lmax(dq)-l
+        l = dq_size(dq)
+        print'("add l :",i0," => ",i0)',lmax(dq),lmax(dq)-l
         allocate(tmp(lmax(dq)-l:rmax(dq)))
         tmp(lmax(dq):rmax(dq)) = dq%array(lmax(dq):rmax(dq))
         call move_alloc(tmp, dq%array)
@@ -64,27 +73,28 @@ contains
 
 
     subroutine reduce_right_allocation(dq)
-        type(deque):: dq
-        integer(int32):: lq
+        type(deque),intent(inout):: dq
+        integer(int32)::new_rmax
         integer(int32),allocatable:: tmp(:)
 
-        lq = size(dq%array)/4
-        ! print'("reduce r :",i0," => ",i0)',rmax(dq),rmax(dq)-lq
-        allocate(tmp(lmax(dq):rmax(dq)-lq))
-        tmp(lmax(dq):rmax(dq)-lq) = dq%array(lmax(dq):rmax(dq)-lq)
+
+        new_rmax = max(dq%r+dq_size(dq)/2, dq%r+1)
+        print'("reduce r :",i0," => ",i0)',rmax(dq),new_rmax
+        allocate(tmp(lmax(dq):new_rmax))
+        tmp(lmax(dq):new_rmax) = dq%array(lmax(dq):new_rmax)
         call move_alloc(tmp, dq%array)
     end subroutine
 
 
     subroutine reduce_left_allocation(dq)
-        type(deque):: dq
-        integer(int32):: lq
+        type(deque),intent(inout):: dq
+        integer(int32)::new_lmax
         integer(int32), allocatable:: tmp(:)
 
-        lq = size(dq%array)/4
-        ! print'("reduce l :",i0," => ",i0)',lmax(dq),lmax(dq)+lq
-        allocate(tmp(lmax(dq)+lq:rmax(dq)))
-        tmp(lmax(dq)+lq:rmax(dq)) = dq%array(lmax(dq)+lq:rmax(dq))
+        new_lmax = min(dq%l-dq_size(dq)/2, dq%l-1)
+        print'("reduce l :",i0," => ",i0)',lmax(dq),new_lmax
+        allocate(tmp(new_lmax:rmax(dq)))
+        tmp(new_lmax:rmax(dq)) = dq%array(new_lmax:rmax(dq))
         call move_alloc(tmp, dq%array)
     end subroutine
 
@@ -93,7 +103,7 @@ contains
         type(deque):: dq
         integer(int32):: ret
 
-        ret = rmax(dq) - (dq%r-1)
+        ret = rmax(dq) - dq%r
     end function
 
 
@@ -101,19 +111,17 @@ contains
         type(deque):: dq
         integer(int32):: ret
 
-        ret = (dq%l-1) - lmax(dq)
+        ret = dq%l - lmax(dq)
     end function
 
 
     subroutine check_allocate_size(dq)
         type(deque):: dq
-        integer(int32):: l_half
 
         if (dq%r > rmax(dq)) call append_right_allocation(dq)
         if (dq%l < lmax(dq)) call append_left_allocation(dq)
-        l_half = size(dq%array)/2
-        if (extra_right(dq) > l_half) call reduce_right_allocation(dq)
-        if (extra_left(dq) > l_half) call reduce_left_allocation(dq)
+        if (extra_right(dq) > dq_size(dq)) call reduce_right_allocation(dq)
+        if (extra_left(dq) > dq_size(dq)) call reduce_left_allocation(dq)
     end subroutine
 
 
@@ -123,9 +131,9 @@ contains
         integer(int32):: v
 
         if (.not. allocated(dq%array)) allocate(dq%array(0:1))
+        dq%r=dq%r+1
         call check_allocate_size(dq)
         dq%array(dq%r) = v
-        dq%r=dq%r+1
     end subroutine
 
 
@@ -135,9 +143,9 @@ contains
         integer(int32):: v
         
         if (.not. allocated(dq%array)) allocate(dq%array(0:1))
+        dq%l=dq%l-1
         call check_allocate_size(dq)
         dq%array(dq%l) = v
-        dq%l=dq%l-1
     end subroutine
 
 
@@ -147,8 +155,8 @@ contains
         integer(int32):: ret
 
         if (.not. dq_remain(dq)) call err_no_elem()
-        dq%r=dq%r-1
         ret = dq%array(dq%r)
+        dq%r=dq%r-1
         call check_allocate_size(dq)
     end function
 
@@ -159,8 +167,8 @@ contains
         integer(int32):: ret
 
         if (.not. dq_remain(dq)) call err_no_elem()
-        dq%l=dq%l+1
         ret = dq%array(dq%l)
+        dq%l=dq%l+1
         call check_allocate_size(dq)
     end function
 
@@ -170,7 +178,8 @@ contains
         class(deque):: dq
         integer(int32):: ret
 
-        ret = dq%array(dq%r-1)
+        if (.not. dq_remain(dq)) call err_no_elem()
+        ret = dq%array(dq%r)
     end function
 
 
@@ -179,16 +188,8 @@ contains
         class(deque):: dq
         integer(int32):: ret
 
-        ret = dq%array(dq%l+1)
-    end function
-
-
-    function dq_size(dq) result(ret)
-        ! 残りの要素数
-        type(deque):: dq
-        integer(int32):: ret
-
-        ret = dq%r-dq%l -1
+        if (.not. dq_remain(dq)) call err_no_elem()
+        ret = dq%array(dq%l)
     end function
 
 
@@ -203,9 +204,9 @@ contains
 
     function dq_to_array(dq) result(ret)
         type(deque):: dq
-        integer(int32):: ret(1:dq%r-dq%l-1)
+        integer(int32):: ret(1:dq_size(dq))
 
-        ret(1:dq%r-dq%l-1) = dq%array(dq%l+1:dq%r-1)
+        ret(1:dq_size(dq)) = dq%array(dq%l:dq%r)
     end function
 
 
@@ -213,12 +214,37 @@ contains
         type(deque):: dq
         integer(int32):: i
 
+        if (.not. allocated(dq%array)) allocate(dq%array(0:1))
+
         print'(a)', "This is 'dq_debug_print' => deque_mod"
         print'(a)', "Output the detailed status of the deque."
         print'("lmax: ", i5,3x, "rmax: ", i5,3x, "array size: ", i5)', lmax(dq), rmax(dq), size(dq%array)
         print'("lptr: ", i5,3x, "rptr: ", i5,3x, "element num: ", i5)', dq%l, dq%r, dq_size(dq)
-        print'("lext: ", i5,3x, "rext: ", i5,3x, "l_half: ", i5)', extra_left(dq), extra_right(dq),size(dq%array)/2
+        print'("lext: ", i5,3x, "rext: ", i5,3x)', extra_left(dq), extra_right(dq)
         print'(a)', "===== elements ====="
-        print'(*(i0,1x))', (merge(dq%array(i), 0, dq%l+1<=i .and. i<=dq%r-1), i=lmax(dq),rmax(dq))
+        print'(*(i0,1x))', (merge(dq%array(i), 0, dq%l<=i .and. i<=dq%r), i=lmax(dq),rmax(dq))
     end subroutine
 end module
+
+
+
+program main
+    use,intrinsic :: iso_fortran_env
+    use:: deque_mod
+    implicit none
+    integer(int32):: i,n,tmp
+    type(deque):: dq
+
+    n = 10000000
+    ! call dq_debug_print(dq)
+    do i=1,2*n
+        call dq%appendleft(i)
+        ! call dq_debug_print(dq)
+    end do
+
+    do i=1,2*n
+        tmp = dq%pop()
+        ! call dq_debug_print(dq)
+    end do
+    
+end program main
