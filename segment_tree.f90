@@ -9,7 +9,7 @@ module segment_tree_mod
         end function
     end interface
     private
-    public:: seg_tree
+    public:: seg_tree, st_from_array
     type,public:: seg_tree
         integer(int32),private:: n, elnum
         integer(int32),allocatable,private:: v(:)
@@ -29,7 +29,7 @@ module segment_tree_mod
 
 contains
     function st_init(n, op, e) result(st)
-        class(seg_tree),pointer:: st
+        type(seg_tree):: st
         procedure(operator):: op
         integer(int32),intent(in):: n,e
         integer(int32):: x
@@ -43,6 +43,24 @@ contains
         end do
         st%n = x
         allocate(st%v(2*x-1), source=e)
+    end function
+
+    function st_from_array(ar, op, e) result(st)
+        type(seg_tree):: st
+        procedure(operator):: op
+        integer(int32),intent(in):: ar(:),e
+        integer(int32):: x
+
+        st%op => op
+        st%e = e
+        st%elnum = size(ar)
+        x=1
+        do while(size(ar) > x)
+            x = 2*x
+        end do
+        st%n = x
+        allocate(st%v(2*x-1), source=e)
+        st%v(x:x+st%elnum-1) = ar(:)
     end function
 
     
@@ -74,6 +92,7 @@ contains
 
         l=a+st%n-1; r=b+st%n-1
         ret = st%e
+        print*, "a"
         do while (l <= r)
             if (      btest(l,0)) ret = st%op(st%v(l), ret)
             if (.not. btest(r,0)) ret = st%op(st%v(r), ret)
@@ -101,11 +120,9 @@ program main
     n=7
     allocate(a, source=[(10**i,i=0,n-1)])
     print'(*(i0,1x))', a
-    st = seg_tree(n,op,1000000000)
-    ! do i=1,n
-    !     call st%update(i,a(i))
-    ! end do
-    ! print'(*(i0,1x))', st%to_array()
+    st = st_from_array(a,op,10**8)
+    print'(*(i0,1x))', st%to_array()
+    print*, st%query(2,5)
 
 
 contains
