@@ -120,9 +120,17 @@ program main
     n=7
     allocate(a, source=[(10**i,i=0,n-1)])
     print'(*(i0,1x))', a
+<<<<<<< HEAD
     st = st_from_array(a,op,10**8)
     print'(*(i0,1x))', st%to_array()
     print*, st%query(2,5)
+=======
+    st = seg_tree(n,op,1000000000)
+    do i=1,n
+        call st%update(i,a(i))
+    end do
+    print'(*(i0,1x))', st%to_array()
+>>>>>>> 88954149acf001729dfb395f8a32405e385985a3
 
 
 contains
