@@ -1,33 +1,57 @@
-! T1, F1
-!min: inf, min(a,b)
-!max: 0,   max(a,b)
-!sum: 0,   a+b
 module segment_tree_mod
     use,intrinsic :: iso_fortran_env
     implicit none
-
-    type seg_tree
-        integer(int32):: n,n2
-        integer(int32),pointer:: v(:)
+    abstract interface
+        function operator(x,y) result(ret)
+            use, intrinsic:: iso_fortran_env
+            integer(int32),intent(in):: x,y
+            integer(int32):: ret
+        end function
+    end interface
+    private
+    public:: seg_tree
+    type,public:: seg_tree
+        integer(int32),private:: n, elnum
+        integer(int32),allocatable,private:: v(:)
+        procedure(operator),pointer,nopass,private:: op => null()
+        integer(int32),private:: e
+    contains
+        procedure:: at => st_at
+        procedure:: update => st_update
+        procedure:: query => st_query
+        procedure:: to_array => st_to_array
     end type
-contains
-    function f(a,b) result(ret)
-        integer(int32):: a,b,ret
-        ret = F1
-    end function
 
-    subroutine st_init(st, n)
-        type(seg_tree):: st
-        integer(int32),intent(in):: n
+    interface seg_tree
+        module procedure:: st_init
+    end interface
+
+
+contains
+    function st_init(n, op, e) result(st)
+        class(seg_tree),pointer:: st
+        procedure(operator):: op
+        integer(int32),intent(in):: n,e
         integer(int32):: x
+
+        st%op => op
+        st%e = e
+        st%elnum = n
         x=1
         do while(n > x)
             x = 2*x
         end do
         st%n = x
-        st%n2 = 2*x-1
-        allocate(st%v(st%n2), source=T1)
-    end subroutine
+        allocate(st%v(2*x-1), source=e)
+    end function
+
+    
+    function st_at(st,i) result(ret)
+        class(seg_tree):: st
+        integer(int32):: i,ret
+
+        ret = st%v(st%n-1+i)
+    end function
 
     subroutine st_update(st, i, x)
         class(seg_tree):: st
@@ -35,34 +59,59 @@ contains
         integer(int32):: ind
         integer(int32), intent(in):: x
         
-        ind = i + st%n - 1
+        ind = i+st%n-1
         st%v(ind) = x
         do while(ind > 1)
             ind = ind/2
-            st%v(ind) = f(st%v(2*ind), st%v(2*ind+1))
+            st%v(ind) = st%op(st%v(2*ind), st%v(2*ind+1))
         end do
     end subroutine
 
     function st_query(st, a, b) result(ret)
-        type(seg_tree):: st
+        class(seg_tree):: st
         integer(int32), intent(in):: a,b
-        integer(int32):: ret
-        ret = st_query_sub(st, a, b, 1, 1, st%n)
+        integer(int32):: ret,l,r
+
+        l=a+st%n-1; r=b+st%n-1
+        ret = st%e
+        do while (l <= r)
+            if (      btest(l,0)) ret = st%op(st%v(l), ret)
+            if (.not. btest(r,0)) ret = st%op(st%v(r), ret)
+            l=(l+1)/2; r=(r-1)/2
+        end do
     end function
 
-    recursive function st_query_sub(st, a, b, k, l, r) result(ret)
-        type(seg_tree),intent(in):: st
-        integer(int32),intent(in):: a,b,k,l,r
-        integer(int32):: ret, vl, vr
+    function st_to_array(st) result(ret)
+        class(seg_tree):: st
+        integer(int32):: ret(st%elnum)
 
-        if (r < a .or. b < l) then
-            ret = T1
-        else if (a <= l .and. r <= b) then
-            ret = st%v(k)
-        else
-            vl = st_query_sub(st,a,b,k*2, l, (l+r)/2)
-            vr = st_query_sub(st,a,b,k*2+1, (l+r)/2+1, r)
-            ret = f(vl,vr)
-        end if
+        ret(:) = st%v(st%n:st%n+st%elnum-1)
     end function
 end module
+
+
+program main
+    use,intrinsic :: iso_fortran_env
+    use segment_tree_mod
+    implicit none
+    integer(int32):: n,i
+    integer(int32), allocatable:: a(:)
+    type(seg_tree):: st
+
+    n=7
+    allocate(a, source=[(10**i,i=0,n-1)])
+    print'(*(i0,1x))', a
+    st = seg_tree(n,op,1000000000)
+    ! do i=1,n
+    !     call st%update(i,a(i))
+    ! end do
+    ! print'(*(i0,1x))', st%to_array()
+
+
+contains
+    function op(x,y) result(ret)
+        integer(int32),intent(in)::x,y
+        integer(int32):: ret
+        ret = min(x,y)
+    end function
+end program main
