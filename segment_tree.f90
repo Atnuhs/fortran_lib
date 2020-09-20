@@ -29,7 +29,7 @@ module segment_tree_mod
 
 contains
     function st_init(n, op, e) result(st)
-        class(seg_tree),pointer:: st
+        type(seg_tree):: st
         procedure(operator):: op
         integer(int32),intent(in):: n,e
         integer(int32):: x
@@ -102,10 +102,10 @@ program main
     allocate(a, source=[(10**i,i=0,n-1)])
     print'(*(i0,1x))', a
     st = seg_tree(n,op,1000000000)
-    ! do i=1,n
-    !     call st%update(i,a(i))
-    ! end do
-    ! print'(*(i0,1x))', st%to_array()
+    do i=1,n
+        call st%update(i,a(i))
+    end do
+    print'(*(i0,1x))', st%to_array()
 
 
 contains
