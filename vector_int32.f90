@@ -23,7 +23,7 @@ contains
     pure subroutine check_array_allocation(vec)
         type(vector_int32),intent(inout):: vec
 
-        if (.not. allocated(vec%array)) allocate(vec%array(0))
+        if (.not. allocated(vec%array)) allocate(vec%array(1))
     end subroutine
 
 
