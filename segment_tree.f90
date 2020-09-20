@@ -49,7 +49,7 @@ contains
         type(seg_tree):: st
         procedure(operator):: op
         integer(int32),intent(in):: ar(:),e
-        integer(int32):: x
+        integer(int32):: x,i
 
         st%op => op
         st%e = e
@@ -61,6 +61,9 @@ contains
         st%n = x
         allocate(st%v(2*x-1), source=e)
         st%v(x:x+st%elnum-1) = ar(:)
+        do i=x-1,1,-1
+            st%v(i) = st%op(st%v(2*i), st%V(2*i+1))
+        end do
     end function
 
     
@@ -92,7 +95,6 @@ contains
 
         l=a+st%n-1; r=b+st%n-1
         ret = st%e
-        print*, "a"
         do while (l <= r)
             if (      btest(l,0)) ret = st%op(st%v(l), ret)
             if (.not. btest(r,0)) ret = st%op(st%v(r), ret)
@@ -107,36 +109,3 @@ contains
         ret(:) = st%v(st%n:st%n+st%elnum-1)
     end function
 end module
-
-
-program main
-    use,intrinsic :: iso_fortran_env
-    use segment_tree_mod
-    implicit none
-    integer(int32):: n,i
-    integer(int32), allocatable:: a(:)
-    type(seg_tree):: st
-
-    n=7
-    allocate(a, source=[(10**i,i=0,n-1)])
-    print'(*(i0,1x))', a
-<<<<<<< HEAD
-    st = st_from_array(a,op,10**8)
-    print'(*(i0,1x))', st%to_array()
-    print*, st%query(2,5)
-=======
-    st = seg_tree(n,op,1000000000)
-    do i=1,n
-        call st%update(i,a(i))
-    end do
-    print'(*(i0,1x))', st%to_array()
->>>>>>> 88954149acf001729dfb395f8a32405e385985a3
-
-
-contains
-    function op(x,y) result(ret)
-        integer(int32),intent(in)::x,y
-        integer(int32):: ret
-        ret = min(x,y)
-    end function
-end program main
