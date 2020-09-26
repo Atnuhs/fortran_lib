@@ -1,5 +1,5 @@
 
-
+! 簡潔だが遅い。配列の際割当が無駄に多いためか?
 recursive function qsort(m) result(res)
     integer, intent(in) :: m(:)
     integer :: res(size(m)) 

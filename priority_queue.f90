@@ -48,16 +48,15 @@ contains
         call add_array(h%val)
     end subroutine
 
-    subroutine add_array(x)
+    subroutine add_array(ar)
+        integer(int64),allocatable,intent(inout):: ar(:)
+        integer(int64),allocatable:: tmp(:)
         integer(int64):: l
-        integer(int64), allocatable:: tmp(:),x(:)
-        l = size(x(:))
-        allocate(tmp(l))
-        tmp(:) = x(:)
-        deallocate(x)
-        allocate(x(l*2))
-        x(1:l) = tmp(:)
-        deallocate(tmp)
+
+        l = size(ar)
+        allocate(tmp(1:2*l))
+        tmp(1:l) = ar(1:l)
+        call move_alloc(tmp, ar)
     end subroutine
 
     recursive subroutine heap_up(h,self)

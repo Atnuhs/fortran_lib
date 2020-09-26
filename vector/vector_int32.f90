@@ -1,3 +1,5 @@
+! fenwic treeでバグらない要注意
+
 module vector_int32_mod
     use,intrinsic :: iso_fortran_env
     implicit none
