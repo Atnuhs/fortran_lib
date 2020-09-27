@@ -1,5 +1,4 @@
 ! ar1のソート順序でar2もソートする。
-
 module double_merge_sort_mod
     use,intrinsic :: iso_fortran_env
     implicit none
