@@ -4,29 +4,34 @@ module lazy_segtree_operators
     implicit none
     integer(int64),parameter:: md = 998244353
     type s_elem
-        integer(int64):: v=0,k=1
+        ! data struct
+
+    contains
+        procedure,private,pass:: s_equals
+        generic:: operator(==) => s_equals
     end type
     type f_elem
-        integer(int64):: v=0
+        ! lazy struct
+
+    contains
+        procedure,private,pass:: f_equals
+        generic:: operator(==) => f_equals
     end type
-    integer(int64):: inv9 = 0
 contains
-    function f_same(f1,f2)
-        type(f_elem),intent(in):: f1,f2
-        logical:: f_same
+    function s_equals(s1,s2) result(isEqual)
+        class(s_elem),intent(in):: s1,s2
+        logical:: isEqual
 
-        f_same = (f1%v == f2%v)
     end function
 
 
-    function s_same(s1,s2)
-        type(s_elem),intent(in):: s1,s2
-        logical:: s_same
+    function f_equals(f1,f2) result(isEqual)
+        class(f_elem),intent(in):: f1,f2
+        logical:: isEqual
 
-        s_same = (s1%v == s2%v .and. s1%k == s2%k)
     end function
 
-    
+
     function e()
         type(s_elem):: e
 
@@ -44,9 +49,9 @@ contains
     function op(a,b)
         type(s_elem),intent(in):: a,b
         type(s_elem):: op
-    
-        op%v = modulo(modulo(a%v*b%k,md) + b%v,md)
-        op%k = modulo(a%k*b%k,md)
+        ! use merge data
+        ! If there is no unit source, use an IF statement
+
     end function
 
 
@@ -54,26 +59,17 @@ contains
         type(s_elem),intent(in):: s
         type(f_elem),intent(in):: f
         type(s_elem):: new_s
+        ! use apply f to s
+        ! Use IF statements if there is no identity map
 
-        if (inv9 ==0) inv9 = inv(9_8,md)
-
-        if (f_same(f,id())) then
-            new_s = s_elem(s%v,s%k)
-        else
-            new_s%v = modulo(modulo((s%k-1)*inv9,md)*f%v,md)
-            new_s%k = s%k
-        end if
     end function
 
 
     function composition(old_f,f) result(new_f)
         type(f_elem),intent(in):: old_f,f
         type(f_elem):: new_f
-        if (f_same(f,id())) then
-            new_f = old_f
-        else
-            new_f = f
-        end if
+        ! Use IF statements if there is no identity map
+        
     end function
 end module
 
@@ -81,6 +77,7 @@ module lazy_segtree_mod
     use,intrinsic :: iso_fortran_env
     use lazy_segtree_operators
     implicit none
+    private
 
     type,public:: lazy_segtree
         type(s_elem),allocatable:: d(:)
@@ -177,7 +174,7 @@ contains
         class(lazy_segtree),intent(inout):: lst
         integer(int32):: i
 
-        if (f_same(lst%lz(i),id())) return
+        if (f_equals(lst%lz(i),id())) return
         if (i < lst%leaf()) then
             lst%lz(i*2) = composition(lst%lz(i*2), lst%lz(i))
             lst%lz(i*2+1) = composition(lst%lz(i*2+1), lst%lz(i))
@@ -242,31 +239,4 @@ contains
         call correct_laziness(lst)
         ret(:) = lst%d(lst%leaf():lst%leaf()+lst%len-1)
     end function
-
-
-    subroutine debug_print(lst)
-        class(lazy_segtree):: lst
-        integer(int32):: l,r
-
-        print'(a)', "datav"
-        l=1; r=1
-        do while(r <= size(lst%d))
-            print'(*(i0,1x))', lst%d(l:r)%v
-            l=l*2; r=r*2+1
-        end do
-
-        print'(a)', "datak"
-        l=1; r=1
-        do while(r <= size(lst%d))
-            print'(*(i0,1x))', lst%d(l:r)%k
-            l=l*2; r=r*2+1
-        end do
-
-        print'(a)', "lz"
-        l=1; r=1
-        do while(r <= size(lst%lz))
-            print'(*(i0,1x))', lst%lz(l:r)%v
-            l=l*2; r=r*2+1
-        end do
-    end subroutine
 end module
