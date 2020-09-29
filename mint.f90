@@ -1,29 +1,34 @@
 module mint_mod
     use, intrinsic :: iso_fortran_env
     implicit none
+    private
     integer(int64) :: md = 1000000007_8
-    type mint
+    type,public:: mint
         integer(int64), private :: val = 0_8
     contains
         procedure:: to_int => mint_to_int64
     end type
+
+    interface mint
+        module procedure:: mi_init
+    end interface
     interface operator( + )
-        module procedure :: add
+        module procedure :: mi_add
     end interface
     interface operator( - )
-        module procedure :: sub
+        module procedure :: mi_sub
     end interface
     interface operator( * )
-        module procedure :: mul
+        module procedure :: mi_mul
     end interface
     interface operator( / )
-        module procedure :: div
+        module procedure :: mi_div
     end interface
     interface operator( ** )
-        module procedure :: pow
+        module procedure :: mi_pow
     end interface
     interface assignment( = )
-        module procedure:: asgn
+        module procedure:: mi_asgn
     end interface
     interface dot_product
         module procedure :: dot_prod
@@ -32,6 +37,14 @@ module mint_mod
         module procedure :: matmul1, matmul2, matmul3
     end interface matmul
 contains
+    pure elemental function mi_init(num) result(ret)
+        class(*),intent(in):: num
+        type(mint):: ret
+        ret = to_modint(num)
+    end function
+
+
+
     pure elemental function to_int64(num) result(ret)
         class(*), intent(in) :: num
         integer(int64):: ret
@@ -54,6 +67,7 @@ contains
         ret=modulo(ret,md)
     end function
 
+
     pure elemental function mint_to_int64(mx) result(ret)
         class(mint),intent(in):: mx
         integer(int64):: ret
@@ -69,7 +83,7 @@ contains
     end function
 
 
-    pure elemental subroutine asgn(xm,y)
+    pure elemental subroutine mi_asgn(xm,y)
         type(mint), intent(inout) :: xm
         class(*), intent(in) :: y
         
@@ -77,7 +91,7 @@ contains
     end subroutine
 
 
-    pure elemental function add(xm,y) result(ret)
+    pure elemental function mi_add(xm,y) result(ret)
         class(mint), intent(in) :: xm
         class(*), intent(in) :: y
         type(mint):: ret
@@ -86,7 +100,7 @@ contains
     end function
 
 
-    pure elemental function sub(xm,y) result(ret)
+    pure elemental function mi_sub(xm,y) result(ret)
         class(mint), intent(in) :: xm
         class(*), intent(in) :: y
         type(mint):: ret
@@ -96,7 +110,7 @@ contains
 
 
 
-    pure elemental function mul(xm,y) result(ret)
+    pure elemental function mi_mul(xm,y) result(ret)
         class(mint), intent(in) :: xm
         class(*), intent(in) :: y
         type(mint) ret
@@ -105,7 +119,7 @@ contains
     end function
 
 
-    pure elemental function div(xm,y) result(ret)
+    pure elemental function mi_div(xm,y) result(ret)
         class(mint), intent(in) :: xm
         class(*), intent(in) :: y
         type(mint):: ret
@@ -138,7 +152,7 @@ contains
     end function
 
 
-    pure elemental function pow(xm,y) result(ret)
+    pure elemental function mi_pow(xm,y) result(ret)
         class(mint), intent(in) :: xm
         class(*), intent(in) :: y
         type(mint):: ret
@@ -149,8 +163,8 @@ contains
         i%val = xm%val
         n = to_int64(y)
         do while (n > 0_8)
-            if (btest(n,0)) ret%val = to_int64(mul(ret,i))
-            i%val = to_int64(mul(i,i))
+            if (btest(n,0)) ret%val = to_int64(mi_mul(ret,i))
+            i%val = to_int64(mi_mul(i,i))
             n = rshift(n,1)
         end do
     end function
@@ -160,7 +174,7 @@ contains
         integer(int64):: i
         if (size(x,1) /= size(y,1)) i = to_int64('')
         do i = 1, size(x,1)
-            call asgn(ret,add(ret,mul(x(i),y(i))))
+            call mi_asgn(ret,mi_add(ret,mi_mul(x(i),y(i))))
         end do
     end function
 
@@ -170,7 +184,7 @@ contains
         type(mint) :: ret(size(x,1))
         integer :: i
         do i = 1, size(x,1)
-            call asgn(ret(i),dot_prod(x(i,:),y))
+            call mi_asgn(ret(i),dot_prod(x(i,:),y))
         end do
     end function
 
@@ -180,7 +194,7 @@ contains
         type(mint) :: ret(size(y,2))
         integer :: i
         do i = 1, size(y,2)
-            call asgn(ret(i),dot_prod(x,y(:,i)))
+            call mi_asgn(ret(i),dot_prod(x,y(:,i)))
         end do
     end function
 
@@ -190,7 +204,7 @@ contains
         type(mint) :: ret(size(x,1),size(y,2))
         integer :: i
         do i = 1, size(x,1)
-            call asgn(ret(i,:),matmul2(x(i,:),y))
+            call mi_asgn(ret(i,:),matmul2(x(i,:),y))
         end do
     end function
 end module mint_mod
