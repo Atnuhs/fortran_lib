@@ -7,45 +7,33 @@ module mint_mod
         integer(int64), private :: val = 0_8
     contains
         procedure:: to_int => mint_to_int64
+        procedure,private:: mi_add
+        procedure,private:: mi_sub
+        procedure,private:: mi_mul
+        procedure,private:: mi_div
+        procedure,private:: mi_pow
+        procedure,private:: mi_asgn
+        generic:: operator( + ) => mi_add
+        generic:: operator( - ) => mi_sub
+        generic:: operator( * ) => mi_mul
+        generic:: operator( / ) => mi_div
+        generic:: operator( ** ) => mi_pow
+        generic:: assignment( = ) => mi_asgn
     end type
 
     interface mint
         module procedure:: mi_init
     end interface
-    interface operator( + )
-        module procedure :: mi_add
-    end interface
-    interface operator( - )
-        module procedure :: mi_sub
-    end interface
-    interface operator( * )
-        module procedure :: mi_mul
-    end interface
-    interface operator( / )
-        module procedure :: mi_div
-    end interface
-    interface operator( ** )
-        module procedure :: mi_pow
-    end interface
-    interface assignment( = )
-        module procedure:: mi_asgn
-    end interface
-    interface dot_product
-        module procedure :: dot_prod
-    end interface dot_product
-    interface matmul
-        module procedure :: matmul1, matmul2, matmul3
-    end interface matmul
 contains
     pure elemental function mi_init(num) result(ret)
         class(*),intent(in):: num
         type(mint):: ret
-        ret = to_modint(num)
+
+        ret = to_mint(num)
     end function
 
 
-
-    pure elemental function to_int64(num) result(ret)
+    pure elemental function int_to_int64(num) result(ret)
         class(*), intent(in) :: num
         integer(int64):: ret
 
@@ -72,22 +60,23 @@ contains
         class(mint),intent(in):: mx
         integer(int64):: ret
 
-        ret = to_int64(mx)
+        ret = int_to_int64(mx)
     end function
 
-    pure elemental function to_modint(num) result(ret)
+
+    pure elemental function to_mint(num) result(ret)
         class(*), intent(in):: num
         type(mint):: ret
 
-        ret%val = to_int64(num)
+        ret%val = int_to_int64(num)
     end function
 
 
     pure elemental subroutine mi_asgn(xm,y)
-        type(mint), intent(inout) :: xm
+        class(mint), intent(inout) :: xm
         class(*), intent(in) :: y
         
-        xm%val = to_int64(y)
+        xm%val = int_to_int64(y)
     end subroutine
 
 
@@ -96,7 +85,7 @@ contains
         class(*), intent(in) :: y
         type(mint):: ret
 
-        ret%val = modulo(xm%val + to_int64(y), md)
+        ret%val = modulo(xm%val + int_to_int64(y), md)
     end function
 
 
@@ -105,7 +94,7 @@ contains
         class(*), intent(in) :: y
         type(mint):: ret
 
-        ret%val = modulo(xm%val - to_int64(y), md)
+        ret%val = modulo(xm%val - int_to_int64(y), md)
     end function
 
 
@@ -115,7 +104,7 @@ contains
         class(*), intent(in) :: y
         type(mint) ret
 
-        ret%val = modulo(xm%val * to_int64(y), md)
+        ret%val = modulo(xm%val * int_to_int64(y), md)
     end function
 
 
@@ -124,7 +113,7 @@ contains
         class(*), intent(in) :: y
         type(mint):: ret
 
-        ret%val = xm%val * to_int64(inv(to_modint(y)))
+        ret%val = xm%val * int_to_int64(inv(to_mint(y)))
     end function
 
     
@@ -161,50 +150,11 @@ contains
 
         ret%val = 1_8
         i%val = xm%val
-        n = to_int64(y)
+        n = int_to_int64(y)
         do while (n > 0_8)
-            if (btest(n,0)) ret%val = to_int64(mi_mul(ret,i))
-            i%val = to_int64(mi_mul(i,i))
+            if (btest(n,0)) ret%val = int_to_int64(mi_mul(ret,i))
+            i%val = int_to_int64(mi_mul(i,i))
             n = rshift(n,1)
-        end do
-    end function
-
-    pure type(mint) function dot_prod(x,y) result(ret)
-        type(mint), intent(in) :: x(:), y(:)
-        integer(int64):: i
-        if (size(x,1) /= size(y,1)) i = to_int64('')
-        do i = 1, size(x,1)
-            call mi_asgn(ret,mi_add(ret,mi_mul(x(i),y(i))))
-        end do
-    end function
-
-
-    pure function matmul1(x,y) result(ret)
-        type(mint), intent(in) :: x(:,:), y(:)
-        type(mint) :: ret(size(x,1))
-        integer :: i
-        do i = 1, size(x,1)
-            call mi_asgn(ret(i),dot_prod(x(i,:),y))
-        end do
-    end function
-
-
-    pure function matmul2(x,y) result(ret)
-        type(mint), intent(in) :: x(:), y(:,:)
-        type(mint) :: ret(size(y,2))
-        integer :: i
-        do i = 1, size(y,2)
-            call mi_asgn(ret(i),dot_prod(x,y(:,i)))
-        end do
-    end function
-
-
-    pure function matmul3(x,y) result(ret)
-        type(mint), intent(in) :: x(:,:), y(:,:)
-        type(mint) :: ret(size(x,1),size(y,2))
-        integer :: i
-        do i = 1, size(x,1)
-            call mi_asgn(ret(i,:),matmul2(x(i,:),y))
         end do
     end function
 end module mint_mod

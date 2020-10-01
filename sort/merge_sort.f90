@@ -70,7 +70,7 @@ contains
             if (m < l) then
                 ar(i:)=tmp(r:); return
             else if (size(ar) < r) then
-                ar(i:)=tmp(l:r); return
+                ar(i:)=tmp(l:m); return
             else
                 if (tmp(l) <= tmp(r)) then
                     ar(i) = tmp(l); l=l+1
