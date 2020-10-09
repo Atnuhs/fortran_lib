@@ -13,6 +13,7 @@ module vector_int32_mod
         procedure:: pop_back=>vec_pop_back, pop=>vec_pop, erase => vec_erase
         procedure:: at=>vec_at, back=>vec_back, head=>vec_head
         procedure:: to_array => vec_to_array, size => vec_size
+        procedure:: update => vec_update
     end type
     interface vector_int32
         module procedure vec_init_from_len, vec_init_from_array
@@ -60,6 +61,15 @@ module vector_int32_mod
         call check_array_allocation(vec)
         ret = vec%array(i)
     end function
+
+
+    subroutine vec_update(vec, i, x)
+        class(vector_int32),intent(inout):: vec
+        integer(int32),intent(in):: i,x
+
+        call check_array_allocation(vec)
+        vec%array(i) = x
+    end subroutine
 
 
     function vec_back(vec) result(ret)

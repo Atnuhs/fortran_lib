@@ -3,6 +3,7 @@ module vec_tree_node_mod
     implicit none
     private
     public:: vtn_insert, vtn_push_back
+    public:: vtn_update
     public:: vtn_erase
     public:: vtn_to_array
     public:: vtn_print, vtn_print_debug
@@ -301,20 +302,43 @@ contains
     end subroutine
 
 
-    recursive function vtn_at(n,ind) result(ret)
+    recursive function vtn_node_at(n,ind) result(ret)
         type(vec_tree_node),pointer:: n
+        integer(int32):: ind
+        type(vec_tree_node),pointer:: ret
+
+        ret => null()
+        if (.not. associated(n)) return
+        if (vtn_ind_at(n) > ind) then
+            ret => vtn_node_at(n%left_child, ind)
+        else if (vtn_ind_at(n) < ind) then
+            ret => vtn_node_at(n%right_child, ind-vtn_ind_at(n))
+        else ! vtn_ind_at(n) == ind
+            ret => n
+        end if
+    end function
+
+
+    function vtn_at(n,ind) result(ret)
+        type(vec_tree_node),pointer:: n, retn
         integer(int32):: ind
         integer(int32):: ret
 
+
+        retn => vtn_node_at(n,ind)
         ret = 0
-        if (.not. associated(n)) return
-        if (vtn_ind_at(n) > ind) then
-            ret = vtn_at(n%left_child, ind)
-        else if (vtn_ind_at(n) < ind) then
-            ret = vtn_at(n%right_child, ind-vtn_ind_at(n))
-        else ! vtn_ind_at(n) == ind
-            ret = n%value
-        end if
+        if (.not. associated(retn)) return
+        ret = retn%value
+    end function
+
+
+    function vtn_update(n,ind,val) result(ret)
+        type(vec_tree_node),pointer:: n, tn, ret
+        integer(int32):: ind, val
+
+        tn => vtn_node_at(n,ind)
+        tn%value = val
+        ret => n
     end function
 end module
 
@@ -335,7 +359,8 @@ module vec_tree_mod
         procedure,public:: insert => vt_insert, erase => vt_erase
         procedure,public:: push_back => vt_push_back, push_front => vt_push_front
         procedure,public:: pop => vt_pop, pop_back => vt_pop_back, pop_front => vt_pop_front
-        procedure,public:: at => vt_value_at
+        procedure,public:: at => vt_value_at, size => vt_size, to_array => vt_to_array
+        procedure,public:: update => vt_update
     end type
 contains
     subroutine vt_insert(vt,i,val)
@@ -359,6 +384,20 @@ contains
             vt%head => vtn_insert(vt%head,i,val)
         end if
         vt%len=vt%len+1
+    end subroutine
+
+
+    subroutine vt_update(vt,i,val)
+        class(vectree):: vt
+        integer(int32):: i,val
+
+        if (i < 1 .or. vt%len < i) then
+            print'(a)', "update index is too big"
+            print'(a)', "index, vectree length"
+            print'(*(i0,1x))', i, vt%len
+            stop
+        end if
+        vt%head => vtn_update(vt%head,i,val)
     end subroutine
 
 
@@ -442,7 +481,7 @@ contains
 
 
     function vt_to_array(vt) result(ret)
-        type(vectree):: vt
+        class(vectree):: vt
         integer(int32):: ret(vt%len),i
         i=1
         call vtn_to_array(vt%head,i,ret)
@@ -450,7 +489,7 @@ contains
 
 
     function vt_size(vt) result(ret)
-        type(vectree):: vt
+        class(vectree):: vt
         integer(int32):: ret
 
         ret = vt%len
