@@ -6,7 +6,7 @@ module vector_int32_mod
     private
     public:: vec_to_array, vec_size
     type,public:: vector_int32
-        integer(int32),allocatable:: array(:)
+        integer(int32),allocatable,private:: array(:)
         integer(int32),private:: l=0
     contains
         procedure:: push_back=>vec_push_back, insert=>vec_insert

@@ -68,7 +68,7 @@ contains
 
         bi = i
         do while (bi <= fw_size(fw))
-            fw%vec%array(bi) = fw%vec%array(bi) + x
+            call fw%vec%update(bi, fw%vec%at(bi)+x)
             bi=bi+lsb(bi)
         end do
     end subroutine
