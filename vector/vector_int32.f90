@@ -12,10 +12,34 @@ module vector_int32_mod
         procedure:: push_back=>vec_push_back, insert=>vec_insert
         procedure:: pop_back=>vec_pop_back, pop=>vec_pop, erase => vec_erase
         procedure:: at=>vec_at, back=>vec_back, head=>vec_head
+        procedure:: to_array => vec_to_array, size => vec_size
     end type
-contains
+    interface vector_int32
+        module procedure vec_init_from_len, vec_init_from_array
+    end interface
+    contains
+    function vec_init_from_len(n,ini) result(ret)
+        type(vector_int32):: ret
+        integer(int32):: n
+        integer(int32),optional:: ini
+        integer(int32):: x
+
+        x=0
+        if (present(ini)) x=ini
+        allocate(ret%array(n), source=x)
+        ret%l = n
+    end function
+
+
+    function vec_init_from_array(ar) result(ret)
+        type(vector_int32):: ret
+        integer(int32):: ar(:)
+
+        allocate(ret%array, source=ar)
+        ret%l = size(ar)
+    end function
     pure function vec_size(vec) result(ret)
-        type(vector_int32),intent(in):: vec
+        class(vector_int32),intent(in):: vec
         integer(int32):: ret
 
         ret = vec%l
@@ -143,7 +167,7 @@ contains
 
 
     function vec_to_array(vec) result(ret)
-        type(vector_int32),intent(inout):: vec
+        class(vector_int32),intent(inout):: vec
         integer(int32):: ret(1:vec%l)
 
         call check_array_allocation(vec)

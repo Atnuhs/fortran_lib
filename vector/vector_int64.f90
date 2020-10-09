@@ -1,44 +1,82 @@
-module vector_int32_mod
+! fenwic treeでバグらない要注意
+
+module vector_int64_mod
     use,intrinsic :: iso_fortran_env
     implicit none
     private
     public:: vec_to_array, vec_size
-    type,public:: vector_int32
+    type,public:: vector_int64
         integer(int64),allocatable:: array(:)
-        integer(int32),private:: l=0
+        integer(int64),private:: l=0
     contains
         procedure:: push_back=>vec_push_back, insert=>vec_insert
         procedure:: pop_back=>vec_pop_back, pop=>vec_pop, erase => vec_erase
         procedure:: at=>vec_at, back=>vec_back, head=>vec_head
+        procedure:: to_array => vec_to_array, size => vec_size
+        procedure:: update => vec_update
     end type
+
+    interface vector_int64
+        module procedure vec_init_from_len, vec_init_from_array
+    end interface
 contains
+    function vec_init_from_len(n,ini) result(ret)
+        type(vector_int64):: ret
+        integer(int64):: n
+        integer(int64),optional:: ini
+        integer(int64):: x
+
+        x=0
+        if (present(ini)) x=ini
+        allocate(ret%array(n), source=x)
+        ret%l = n
+    end function
+
+
+    function vec_init_from_array(ar) result(ret)
+        type(vector_int64):: ret
+        integer(int64):: ar(:)
+
+        allocate(ret%array, source=ar)
+        ret%l = size(ar)
+    end function
+
+
     pure function vec_size(vec) result(ret)
-        type(vector_int32),intent(in):: vec
-        integer(int32):: ret
+        class(vector_int64),intent(in):: vec
+        integer(int64):: ret
 
         ret = vec%l
     end function
 
 
     pure subroutine check_array_allocation(vec)
-        type(vector_int32),intent(inout):: vec
+        type(vector_int64),intent(inout):: vec
 
         if (.not. allocated(vec%array)) allocate(vec%array(1))
     end subroutine
 
 
     function vec_at(vec,i) result(ret)
-        class(vector_int32),intent(inout):: vec
-        integer(int32):: i
-        integer(int64):: ret
+        class(vector_int64),intent(inout):: vec
+        integer(int64):: i,ret
 
         call check_array_allocation(vec)
         ret = vec%array(i)
     end function
 
 
+    subroutine vec_update(vec, i, x)
+        class(vector_int64),intent(inout):: vec
+        integer(int64),intent(in):: i,x
+
+        call check_array_allocation(vec)
+        vec%array(i) = x
+    end subroutine
+
+
     function vec_back(vec) result(ret)
-        class(vector_int32),intent(inout):: vec
+        class(vector_int64),intent(inout):: vec
         integer(int64):: ret
         
         ret = vec%at(vec%l)
@@ -46,16 +84,16 @@ contains
 
 
     function vec_head(vec) result(ret)
-        class(vector_int32),intent(inout):: vec
+        class(vector_int64),intent(inout):: vec
         integer(int64):: ret
         
-        ret = vec%at(1)
+        ret = vec%at(1_int64)
     end function
 
 
     pure subroutine vec_append_array(vec,l,r)
-        type(vector_int32),intent(inout):: vec
-        integer(int32),intent(in):: l,r
+        type(vector_int64),intent(inout):: vec
+        integer(int64),intent(in):: l,r
         integer(int64),allocatable:: tmp(:)
         
         allocate(tmp(l:2*r))
@@ -65,8 +103,8 @@ contains
 
 
     pure subroutine vec_reduce_array(vec,l,r)
-        type(vector_int32),intent(inout):: vec
-        integer(int32),intent(in):: l,r
+        type(vector_int64),intent(inout):: vec
+        integer(int64),intent(in):: l,r
         integer(int64),allocatable:: tmp(:)
         
         allocate(tmp(l:r/2))
@@ -76,21 +114,21 @@ contains
 
 
     pure subroutine check_allocation_size(vec)
-        type(vector_int32),intent(inout):: vec
-        integer(int32):: len_alloc
+        type(vector_int64),intent(inout):: vec
+        integer(int64):: len_alloc
 
         call check_array_allocation(vec)
         len_alloc = size(vec%array)
         if (vec%l >= len_alloc) then
-            call vec_append_array(vec,1,len_alloc)
+            call vec_append_array(vec,1_int64,len_alloc)
         else if (vec%l <= len_alloc/2) then
-            call vec_reduce_array(vec,1,len_alloc)
+            call vec_reduce_array(vec,1_int64,len_alloc)
         end if
     end subroutine
 
 
     pure subroutine vec_push_back(vec, v)
-        class(vector_int32),intent(inout):: vec
+        class(vector_int64),intent(inout):: vec
         integer(int64),intent(in):: v
 
         vec%l=vec%l+1
@@ -100,9 +138,8 @@ contains
 
 
     pure subroutine vec_insert(vec,i,v)
-        class(vector_int32),intent(inout):: vec
-        integer(int32),intent(in):: i
-        integer(int64),intent(in):: v
+        class(vector_int64),intent(inout):: vec
+        integer(int64),intent(in)::i, v
 
         vec%l=vec%l+1
         call check_allocation_size(vec)
@@ -112,7 +149,7 @@ contains
 
 
     function vec_pop_back(vec) result(ret)
-        class(vector_int32),intent(inout):: vec
+        class(vector_int64),intent(inout):: vec
         integer(int64):: ret
 
         ret = vec%back()
@@ -122,8 +159,8 @@ contains
 
 
     function vec_pop(vec,i) result(ret)
-        class(vector_int32),intent(inout):: vec
-        integer(int32),intent(in):: i
+        class(vector_int64),intent(inout):: vec
+        integer(int64),intent(in):: i
         integer(int64):: ret
 
         ret = vec%at(i)
@@ -134,8 +171,8 @@ contains
 
 
     subroutine vec_erase(vec,i)
-        class(vector_int32):: vec
-        integer(int32),intent(in):: i
+        class(vector_int64):: vec
+        integer(int64),intent(in):: i
         integer(int64):: dmp
 
         dmp = vec%pop(i)
@@ -143,7 +180,7 @@ contains
 
 
     function vec_to_array(vec) result(ret)
-        type(vector_int32),intent(inout):: vec
+        class(vector_int64),intent(inout):: vec
         integer(int64):: ret(1:vec%l)
 
         call check_array_allocation(vec)
