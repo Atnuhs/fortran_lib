@@ -384,24 +384,3 @@ contains
         call set_node_to_array(s%head,i,ret)
     end function
 end module
-
-
-program main
-    use,intrinsic :: iso_fortran_env
-    use set_mod
-    implicit none
-    type(set):: s,t
-    integer(int32):: i,n
-
-    read*, n
-    do i=1,n
-        call s%insert(mod(i,10))
-        ! call s_print_debug(s)
-    end do
-
-    do i=1,10,2
-        call s%erase(i)
-        call s_print_debug(s)
-    end do
-    print'(*(i0,1x))', s%to_array()
-end program main
