@@ -17,8 +17,17 @@ contains
     end subroutine
 
 
+    function perm(n,p,md) result(ret)
+        ! fractionを作ってから使う
+        integer(int64),intent(in):: n,p,md
+        integer(int64):: ret
+        
+        ret = mod(frac(n)*ifrac(p), md)
+    end function
+
     function comb(n,p,md) result(ret)
-        integer(int32):: n,p,md
+        ! fractionを作ってから使う
+        integer(int64),intent(in):: n,p,md
         integer(int64):: ret
         
         ret = mod(mod(frac(n)*ifrac(p),md)*ifrac(n-p),md)
