@@ -22,9 +22,10 @@ contains
         integer(int64),intent(in):: n,p,md
         integer(int64):: ret
         
-        ret = mod(frac(n)*ifrac(p), md)
+        ret = mod(frac(n)*ifrac(n-p), md)
     end function
 
+    
     function comb(n,p,md) result(ret)
         ! fractionを作ってから使う
         integer(int64),intent(in):: n,p,md
