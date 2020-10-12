@@ -59,14 +59,14 @@ contains
     end subroutine
 
 
-    subroutine h_pop(h,val)
+    function h_pop(h) result(val)
         class(heap):: h
-        integer(int32),intent(out):: val
+        integer(int32):: val
         val=h%val(1)
         h%val(1) = h%val(h%len)
         h%len=h%len-1
         call heap_down(h,1_int32)
-    end subroutine
+    end function
 
 
     subroutine add(h)
@@ -116,25 +116,26 @@ contains
     end subroutine
 
 
-    subroutine h_to_array(h,v_ar)
+    function h_to_array(h) result(v_ar)
         class(heap):: h
         integer(int32):: i,v_ar(h%len)
 
         i=1
         do while(h_remain(h))
-            call h_pop(h,v_ar(i))
+            v_ar(i) = h_pop(h)
             i=i+1
         end do
-    end subroutine
+    end function
 
 
-    subroutine heap_sort(v_ar)
+    function heap_sort(v_ar) result(ret)
         type(heap):: h
-        integer(int32):: v_ar(:)
+        integer(int32),intent(in):: v_ar(:)
+        integer(int32):: ret(size(v_ar))
 
         h = heap(v_ar)
-        call h_to_array(h,v_ar)
-    end subroutine
+        ret = h_to_array(h)
+    end function
 
 
     subroutine k_swap(h,i1,i2)
