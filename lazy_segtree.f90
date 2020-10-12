@@ -109,8 +109,9 @@ module lazy_segtree_mod
     end interface
 contains
     function lst_init(n) result(lst)
-        ! 要素と作用を持つ配列を割り当て
-        ! 長さを与える
+        ! 要素のセグ木、作用のセグ木を割り当て
+        ! 完全二分木として割り当てている(最適化の余地あり)
+        ! lst%len = 要素数
         type(lazy_segtree):: lst
         integer(int32),intent(in):: n
         integer(int32):: x
@@ -127,7 +128,7 @@ contains
 
 
     function lst_leaf(lst)
-        ! 葉の数
+        ! 完全二分木の葉の数 (/= 要素数)を返す
         class(lazy_segtree):: lst
         integer(int32):: lst_leaf
 
