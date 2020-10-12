@@ -2,44 +2,53 @@ module heap_mod
     use,intrinsic :: iso_fortran_env
     private
     type, public:: heap
-        integer(int64),private:: i
+        integer(int64),private:: len
         integer(int64), allocatable,private:: key(:)
         integer(int64), allocatable,private:: val(:)
     contains
-        procedure:: append => append_heap
-        procedure:: pop => pop_heap
+        procedure:: push => h_push
+        procedure:: pop => h_pop
     end type
     interface heap
-        module procedure init_heap
+        module procedure init_heap, init_heap_with_len
     end interface
 contains
     function init_heap() result(h)
         type(heap):: h
-        h%i=0
+        h%len=0
         allocate(h%key(1))
         allocate(h%val(1))
     end function
 
 
-    subroutine append_heap(h,k,v)
+    function init_heap_with_len(n) result(h)
+        integer(int64),intent(in):: n
+        type(heap):: h
+        h%len=0
+        allocate(h%key(n))
+        allocate(h%val(n))
+    end function
+
+
+    subroutine h_push(h,k,v)
         class(heap):: h
         integer(int64):: k,v
-        if (h%i+1 >= size(h%key)) call add(h)
-        h%i=h%i+1
-        h%key(h%i) = k
-        h%val(h%i) = v
-        call heap_up(h,h%i)
+        if (h%len+1 >= size(h%key)) call add(h)
+        h%len=h%len+1
+        h%key(h%len) = k
+        h%val(h%len) = v
+        call heap_up(h,h%len)
     end subroutine
 
 
-    subroutine pop_heap(h,k,v)
+    subroutine h_pop(h,k,v)
         class(heap):: h
         integer(int64),intent(out):: k,v
         k=h%key(1)
         v=h%val(1)
-        h%key(1) = h%key(h%i)
-        h%val(1) = h%val(h%i)
-        h%i=h%i-1
+        h%key(1) = h%key(h%len)
+        h%val(1) = h%val(h%len)
+        h%len=h%len-1
         call heap_down(h,1_8)
     end subroutine
 
@@ -63,43 +72,32 @@ contains
     end subroutine
 
 
-    recursive subroutine heap_up(h,self)
+    subroutine heap_up(h,ind)
         class(heap):: h
-        integer(int64):: self
-        if (self == 1) return
-        if (h%key(self) > h%key(self/2))then
-            call kv_swap(h,self,self/2)
-            call heap_up(h,self/2)
-        end if
+        integer(int64),value:: ind
+        integer(int64):: c
+
+        do while(ind > 1)
+            c = ind/2
+            if (h%key(ind) <= h%key(c)) return
+            call kv_swap(h,ind,c)
+            ind=c 
+        end do
     end subroutine
 
 
-    recursive subroutine heap_down(h,self)
+    subroutine heap_down(h,ind)
         class(heap):: h
-        integer(int64):: self,c1,c2
+        integer(int64),value:: ind
+        integer(int64):: c1,c2,c
 
-        c1 = self*2
-        c2 = c1+1
-        if (c2 <= h%i) then
-            if (h%key(c1) >= h%key(c2)) then
-                if (h%key(c1) > h%key(self)) then
-                    call kv_swap(h,c1,self)
-                    call heap_down(h,c1)
-                end if
-            else
-                if (h%key(c2) > h%key(self)) then
-                    call kv_swap(h,c2,self)
-                    call heap_down(h,c2)
-                end if
-            end if
-        else if (c1 <= h%i) then
-            if (h%key(c1) >= h%key(self)) then
-                call kv_swap(h,c1,self)
-                call heap_down(h,c1)
-            end if
-        else
-            return
-        end if
+        do while(ind*2 <= h%len)
+            c1 = ind*2; c2 = c1+1; c=c1
+            if (c2 <= h%len) c = merge(c1,c2,h%key(c1) >= h%key(c2))
+            if (h%key(c) <= h%key(ind)) return
+            call kv_swap(h,c,ind)
+            ind = c
+        end do
     end subroutine
 
 
@@ -109,10 +107,10 @@ contains
         
         call swap(h%key(x),h%key(y))
         call swap(h%val(x),h%val(y))
-    end subroutine
-
-    subroutine swap(x,y)
-        integer(int64):: x,y,t
-        t=x; x=y; y=t
+    contains
+        subroutine swap(x,y)
+            integer(int64):: x,y,t
+            t=x; x=y; y=t
+        end subroutine
     end subroutine
 end module
