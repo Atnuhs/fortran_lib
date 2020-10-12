@@ -144,12 +144,12 @@ contains
     end subroutine
 
 
-    subroutine kv_swap(hm,x,y)
+    subroutine kv_swap(hm,i1,i2)
         type(heap_map):: hm
-        integer(int32):: x,y
+        integer(int32):: i1,i2
         
-        call swap(hm%key(x),hm%key(y))
-        call swap(hm%val(x),hm%val(y))
+        call swap(hm%key(i1),hm%key(i2))
+        call swap(hm%val(i1),hm%val(i2))
     contains
         subroutine swap(x,y)
             integer(int32):: x,y,t
