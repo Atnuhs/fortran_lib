@@ -92,18 +92,3 @@ contains
         print'(*(i0,1x))', vec_to_array(fw%vec)
     end subroutine
 end module
-
-
-program main
-    use,intrinsic :: iso_fortran_env
-    use fenwic_tree_mod
-    implicit none
-    type(fenwic):: fw
-    integer(int32):: i,n
-
-    n = 6
-    do i=0,n
-        call fw_push(fw,10**i)
-        call fw_debug_print(fw)
-    end do
-end program main

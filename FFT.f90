@@ -18,10 +18,10 @@ contains
         ! n == 2^i
 
         n = size(re_x)
-        allocate(re_w(n), im_w(n))
+        allocate(re_w(n/2), im_w(n/2))
 
         inv_n = 1d0/dble(n)
-        do i=1,n
+        do i=1,n/2
             re_w(i) = cos(pi2*dble(i-1)*inv_n)
             im_w(i) = -sin(pi2*dble(i-1)*inv_n)
         end do
@@ -41,10 +41,10 @@ contains
         ! n == 2^i
 
         n = size(re_x)
-        allocate(re_w(n), im_w(n))
+        allocate(re_w(n/2), im_w(n/2))
 
         inv_n = 1d0/dble(n)
-        do i=1,n
+        do i=1,n/2
             re_w(i) = cos(pi2*dble(i-1)*inv_n)
             im_w(i) = sin(pi2*dble(i-1)*inv_n)
         end do
@@ -182,45 +182,3 @@ contains
         end do
     end subroutine
 end module fft_2_mod
-
-
-program debug_module_fft_2
-    use,intrinsic :: iso_fortran_env
-    use fft_2_mod
-    implicit none
-    integer(int32),parameter:: n=7
-    integer(int32)::i
-    real(real64):: a(n)=0,b(n)=0,c(n)=0,c2(n)=0
-
-    a(:) = [1,2,3,-4,5,6,7]
-    b(:) = [1,2,-3,4,5,6,8]
-
-    open(11,file='./fft_source.txt', status='replace')
-    do i=1,n
-        write(11,'(i0,1x,f0.7)')i, a(i)
-    end do
-    close(11)
-    
-    call liner_correlation(a,b,c)
-    call liner_correlation_non_fft(a,b,c2)
-
-    open(12,file='./fft_result.txt', status='replace')
-    write(12,*) "i, source, acf_fft, acf_non_fft"
-    do i=1,n
-        write(12,*)i, a(i), c(i), c2(i)
-    end do
-    close(12)
-contains
-    subroutine liner_correlation_non_fft(f,g,x)
-        real(real64), intent(in):: f(:),g(:)
-        real(real64), intent(out):: x(:)
-        integer(int32):: i,d
-
-        x(:) = 0
-        do i=1,size(f)
-            do d=0,size(f)-i
-                x(d+1) = x(d+1) + f(i)*g(i+d)
-            end do
-        end do
-    end subroutine
-end program debug_module_fft_2
