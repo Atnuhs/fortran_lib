@@ -6,7 +6,7 @@ module fft_2_mod
     public:: fft_2, ifft_2
     public:: convolution, liner_convolution
     public:: correlation, liner_correlation
-    public:: acf
+    public:: auto_correlation_function
     
 contains
     subroutine fft_2(re_x, im_x)
@@ -208,17 +208,41 @@ program main
     real(real64), allocatable:: a(:),b(:),c(:)
     integer(int32):: i,n,nn
 
+    print*, 'please input array length'
     read*, n
     allocate(a(n), source=[(real(i,kind=real64),i=1,n)])
     allocate(b(n),c(n))
-    print'(*(f8.3))', a(:)
+    print'(a)', repeat("=",20), "input", repeat("=",20)
+    print'(*(e10.3))', a(:)
     nn=2
     do while(nn < n)
         nn = nn*2
     end do
+
+    b = auto_correlation_function(a,nn) ! 整数nnはsize(a)より大きい最小の2のべき乗
+    c = auto_correlation_function_non_fft(a)
+    if (n < 100) then
+        print'(a)', repeat("=",20), "result-fft", repeat("=",20)
+        print'(*(e10.3))', b(:)
+        print'(a)', repeat("=",20), "result-non-fft", repeat("=",20)
+        print'(*(e10.3))', c(:)
+    end if
+    print'(a)', repeat("=",20), "diff sum", repeat("=",20)
+    print*, sum(b(:)-c(:))
     
-    call liner_correlation(a,a,b)
-    print'(*(f8.3))', b(:)
-    c = auto_correlation_function(a,nn)
-    print'(*(f8.3))', c(:)
+contains
+    function auto_correlation_function_non_fft(a) result(x)
+        real(real64),intent(in):: a(:)
+        real(real64),allocatable:: x(:)
+        integer(int32):: t,n,tau
+
+        n = size(a)
+        allocate(x(0:n-1), source=0d0)
+
+        do tau=0,n-1
+            do t=1,n-tau
+                x(tau) = x(tau) + a(t)*a(t+tau)
+            end do
+        end do
+    end function
 end program main
