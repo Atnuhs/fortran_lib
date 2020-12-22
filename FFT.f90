@@ -6,6 +6,7 @@ module fft_2_mod
     public:: fft_2, ifft_2
     public:: convolution, liner_convolution
     public:: correlation, liner_correlation
+    public:: acf
     
 contains
     subroutine fft_2(re_x, im_x)
@@ -55,6 +56,61 @@ contains
     end subroutine
 
 
+    recursive subroutine fft_2_calc(re_x, im_x, re_w, im_w, n)
+        integer(int32),intent(in):: n
+        real(real64), intent(inout):: re_x(:), im_x(:)
+        real(real64), intent(in):: re_w(:), im_w(:)
+        real(real64):: re_b1, im_b1, re_b2, im_b2
+        integer(int32):: hn,i,j
+
+        if (n==1) return
+        hn = n/2
+
+        do i=1,hn
+            j = hn+i
+            re_b1 = re_x(i); im_b1 = im_x(i)
+            re_b2 = re_x(j); im_b2 = im_x(j)
+
+            re_x(i) = re_b1+re_b2
+            im_x(i) = im_b1+im_b2
+
+            re_x(j) = (re_b1-re_b2)*re_w(i) - (im_b1-im_b2)*im_w(i)
+            im_x(j) = (re_b1-re_b2)*im_w(i) + (im_b1-im_b2)*re_w(i)
+        end do
+
+        call fft_2_calc(re_x(1:hn), im_x(1:hn), re_w(1:hn:2), im_w(1:hn:2), hn)
+        call fft_2_calc(re_x(hn+1:n), im_x(hn+1:n), re_w(1:hn:2), im_w(1:hn:2), hn)
+    end subroutine
+
+
+    subroutine fft_2_bit_rev(re_x, im_x, n)
+        integer(int32), intent(in):: n
+        real(real64), intent(inout):: re_x(:), im_x(:)
+
+        call generate_bit_rev(re_x, n)
+        call generate_bit_rev(im_x, n)
+    end subroutine
+
+
+    recursive subroutine generate_bit_rev(bit_rev,n)
+    integer(int32), intent(in):: n
+        real(real64), intent(inout):: bit_rev(:)
+        real(real64):: tmp(n)
+        integer(int32):: hn,i,j
+        hn = n/2
+        if (hn > 2) then
+            call generate_bit_rev(bit_rev(1:hn), hn)
+            call generate_bit_rev(bit_rev(hn+1:n), hn)
+        end if
+        tmp(:) = bit_rev(:)
+        do i=1,hn
+            j=hn+i
+            bit_rev(2*i-1) = tmp(i)
+            bit_rev(2*i) = tmp(j)
+        end do
+    end subroutine
+
+
     subroutine convolution(f,g,x)
         real(real64), intent(inout):: f(:),g(:),x(:)
         real(real64), allocatable:: rf(:),rg(:),rx(:)
@@ -77,7 +133,7 @@ contains
         integer(int32):: n
 
         n = 2
-        do while(n <= size(f))
+        do while(n < size(f))
             n=n*2
         end do
 
@@ -115,7 +171,7 @@ contains
         integer(int32):: n
 
         n = 2
-        do while(n <= size(f))
+        do while(n < size(f))
             n=n*2
         end do
 
@@ -128,57 +184,41 @@ contains
     end subroutine
 
 
-    recursive subroutine fft_2_calc(re_x, im_x, re_w, im_w, n)
+    function auto_correlation_function(a,n) result(x)
+        real(real64),intent(in):: a(:)
         integer(int32),intent(in):: n
-        real(real64), intent(inout):: re_x(:), im_x(:)
-        real(real64), intent(in):: re_w(:), im_w(:)
-        real(real64):: re_b1, im_b1, re_b2, im_b2
-        integer(int32):: hn,i,j
+        real(real64),allocatable:: x(:), x2(:), rx2(:), a2(:), ra2(:)
 
-        if (n==1) return
-        hn = n/2
-
-        do i=1,hn
-            j = hn+i
-            re_b1 = re_x(i); im_b1 = im_x(i)
-            re_b2 = re_x(j); im_b2 = im_x(j)
-
-            re_x(i) = re_b1+re_b2
-            im_x(i) = im_b1+im_b2
-
-            re_x(j) = (re_b1-re_b2)*re_w(i) - (im_b1-im_b2)*im_w(i)
-            im_x(j) = (re_b1-re_b2)*im_w(i) + (im_b1-im_b2)*re_w(i)
-        end do
-
-        call fft_2_calc(re_x(1:hn), im_x(1:hn), re_w(1:n:2), im_w(1:n:2), hn)
-        call fft_2_calc(re_x(hn+1:n), im_x(hn+1:n), re_w(1:n:2), im_w(1:n:2), hn)
-    end subroutine
-
-
-    subroutine fft_2_bit_rev(re_x, im_x, n)
-        integer(int32), intent(in):: n
-        real(real64), intent(inout):: re_x(:), im_x(:)
-
-        call generate_bit_rev(re_x, n)
-        call generate_bit_rev(im_x, n)
-    end subroutine
-
-
-    recursive subroutine generate_bit_rev(bit_rev,n)
-    integer(int32), intent(in):: n
-        real(real64), intent(inout):: bit_rev(:)
-        real(real64):: tmp(n)
-        integer(int32):: hn,i,j
-        hn = n/2
-        if (hn > 2) then
-            call generate_bit_rev(bit_rev(1:hn), hn)
-            call generate_bit_rev(bit_rev(hn+1:n), hn)
-        end if
-        tmp(:) = bit_rev(:)
-        do i=1,hn
-            j=hn+i
-            bit_rev(2*i-1) = tmp(i)
-            bit_rev(2*i) = tmp(j)
-        end do
-    end subroutine
+        allocate(a2(2*n),ra2(2*n),source=0d0)
+        a2(1:size(a)) = a(:)
+        call fft_2(a2,ra2)
+        allocate(x2, source=a2(:)*a2(:) + ra2(:)*ra2(:))
+        deallocate(a2,ra2)
+        allocate(rx2(2*n), source=0d0)
+        call ifft_2(x2, rx2)
+        allocate(x, source=x2(1:size(a)))
+    end function
 end module fft_2_mod
+
+
+program main
+    use fft_2_mod
+    use,intrinsic :: iso_fortran_env
+    implicit none
+    real(real64), allocatable:: a(:),b(:),c(:)
+    integer(int32):: i,n,nn
+
+    read*, n
+    allocate(a(n), source=[(real(i,kind=real64),i=1,n)])
+    allocate(b(n),c(n))
+    print'(*(f8.3))', a(:)
+    nn=2
+    do while(nn < n)
+        nn = nn*2
+    end do
+    
+    call liner_correlation(a,a,b)
+    print'(*(f8.3))', b(:)
+    c = auto_correlation_function(a,nn)
+    print'(*(f8.3))', c(:)
+end program main
