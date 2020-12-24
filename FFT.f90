@@ -32,8 +32,8 @@ contains
             im_w(i) = -sin(pi2*dble(i-1)*inv_n)
         end do
 
-        call fft_2_bit_rev(re_x, im_x, n)
         call fft_2_calc(re_x, im_x, re_w, im_w, n)
+        call fft_2_bit_rev(re_x, im_x, n)
     end subroutine
 
 
@@ -55,8 +55,8 @@ contains
             im_w(i) = sin(pi2*dble(i-1)*inv_n)
         end do
 
-        call fft_2_bit_rev(re_x, im_x, n)
         call fft_2_calc(re_x, im_x, re_w, im_w, n)
+        call fft_2_bit_rev(re_x, im_x, n)
         re_x = re_x/n
     end subroutine
 
@@ -65,26 +65,24 @@ contains
         integer(int32),intent(in):: n
         real(real64), intent(inout):: re_x(:), im_x(:)
         real(real64), intent(in):: re_w(:), im_w(:)
-        real(real64):: re_s, im_s, re_t, im_t, re_wv, im_wv
-        integer(int32):: b,j,k,i1,i2
+        real(real64):: re_xi, im_xi, re_xj, im_xj
+        integer(int32):: hn,i,j
 
-        b=1
-        print*, '--'
-        do while(b < n)! half block size
-            do j=1,b
-                re_wv = re_w(n/(2*b)*(j))
-                im_wv = im_w(n/(2*b)*(j))
-                do k=0,n-1,2*b
-                    print*, j+k, j+k+b
-                    i1 = j+k; i2 = j+k+b
-                    re_s=re_x(i1);       im_s=im_x(i1)
-                    re_t=re_x(i2)*re_wv; im_t=im_x(i2)*im_wv
-                    re_x(i1)=re_s+re_t;  im_x(i1)=im_s+im_t
-                    re_x(i2)=re_s-re_t;  im_x(i2)=im_s-im_t
-                end do
-            end do
-            b=b*2
+        hn = n/2
+
+        do i=1,hn
+            j = hn+i
+            re_xi = re_x(i); im_xi = im_x(i)
+            re_xj = re_x(j); im_xj = im_x(j)
+
+            re_x(i) = re_xi + re_xj; im_x(i) = im_xi + im_xj
+
+            re_x(j) = (re_xi-re_xj)*re_w(i) - (im_xi-im_xj)*im_w(i)
+            im_x(j) = (re_xi-re_xj)*im_w(i) + (im_xi-im_xj)*re_w(i)
         end do
+        if (hn==1) return
+        call fft_2_calc(re_x(1:hn), im_x(1:hn), re_w(1:hn:2), im_w(1:hn:2), hn)
+        call fft_2_calc(re_x(hn+1:n), im_x(hn+1:n), re_w(1:hn:2), im_w(1:hn:2), hn)
     end subroutine
 
 
