@@ -9,6 +9,12 @@ module fft_2_mod
     public:: auto_correlation_function
     
 contains
+    subroutine swap(x,y)
+        real(real64),intent(inout):: x,y
+        real(real64):: t
+        t=x; x=y; y=t
+    end subroutine
+
     subroutine fft_2(re_x, im_x)
         real(real64), intent(inout):: re_x(:)
         real(real64), intent(inout):: im_x(:)
@@ -17,7 +23,6 @@ contains
         real(real64), allocatable:: re_w(:), im_w(:)
 
         ! n == 2^i
-
         n = size(re_x)
         allocate(re_w(n/2), im_w(n/2))
 
@@ -27,8 +32,8 @@ contains
             im_w(i) = -sin(pi2*dble(i-1)*inv_n)
         end do
 
-        call fft_2_calc(re_x, im_x, re_w, im_w, n)
         call fft_2_bit_rev(re_x, im_x, n)
+        call fft_2_calc(re_x, im_x, re_w, im_w, n)
     end subroutine
 
 
@@ -50,8 +55,8 @@ contains
             im_w(i) = sin(pi2*dble(i-1)*inv_n)
         end do
 
-        call fft_2_calc(re_x, im_x, re_w, im_w, n)
         call fft_2_bit_rev(re_x, im_x, n)
+        call fft_2_calc(re_x, im_x, re_w, im_w, n)
         re_x = re_x/n
     end subroutine
 
@@ -60,55 +65,51 @@ contains
         integer(int32),intent(in):: n
         real(real64), intent(inout):: re_x(:), im_x(:)
         real(real64), intent(in):: re_w(:), im_w(:)
-        real(real64):: re_b1, im_b1, re_b2, im_b2
-        integer(int32):: hn,i,j
+        real(real64):: re_s, im_s, re_t, im_t, re_wv, im_wv
+        integer(int32):: b,j,k,i1,i2
 
-        if (n==1) return
-        hn = n/2
-
-        do i=1,hn
-            j = hn+i
-            re_b1 = re_x(i); im_b1 = im_x(i)
-            re_b2 = re_x(j); im_b2 = im_x(j)
-
-            re_x(i) = re_b1+re_b2
-            im_x(i) = im_b1+im_b2
-
-            re_x(j) = (re_b1-re_b2)*re_w(i) - (im_b1-im_b2)*im_w(i)
-            im_x(j) = (re_b1-re_b2)*im_w(i) + (im_b1-im_b2)*re_w(i)
+        b=1
+        print*, '--'
+        do while(b < n)! half block size
+            do j=1,b
+                re_wv = re_w(n/(2*b)*(j))
+                im_wv = im_w(n/(2*b)*(j))
+                do k=0,n-1,2*b
+                    print*, j+k, j+k+b
+                    i1 = j+k; i2 = j+k+b
+                    re_s=re_x(i1);       im_s=im_x(i1)
+                    re_t=re_x(i2)*re_wv; im_t=im_x(i2)*im_wv
+                    re_x(i1)=re_s+re_t;  im_x(i1)=im_s+im_t
+                    re_x(i2)=re_s-re_t;  im_x(i2)=im_s-im_t
+                end do
+            end do
+            b=b*2
         end do
-
-        call fft_2_calc(re_x(1:hn), im_x(1:hn), re_w(1:hn:2), im_w(1:hn:2), hn)
-        call fft_2_calc(re_x(hn+1:n), im_x(hn+1:n), re_w(1:hn:2), im_w(1:hn:2), hn)
     end subroutine
 
 
     subroutine fft_2_bit_rev(re_x, im_x, n)
         integer(int32), intent(in):: n
         real(real64), intent(inout):: re_x(:), im_x(:)
+        integer(int32)::i,j,k,h
 
-        call generate_bit_rev(re_x, n)
-        call generate_bit_rev(im_x, n)
-    end subroutine
-
-
-    recursive subroutine generate_bit_rev(bit_rev,n)
-    integer(int32), intent(in):: n
-        real(real64), intent(inout):: bit_rev(:)
-        real(real64):: tmp(n)
-        integer(int32):: hn,i,j
-        hn = n/2
-        if (hn > 2) then
-            call generate_bit_rev(bit_rev(1:hn), hn)
-            call generate_bit_rev(bit_rev(hn+1:n), hn)
-        end if
-        tmp(:) = bit_rev(:)
-        do i=1,hn
-            j=hn+i
-            bit_rev(2*i-1) = tmp(i)
-            bit_rev(2*i) = tmp(j)
+        h=0
+        do while(lshift(1,h) < n)
+            h=h+1
+        end do
+        do i=0,n-1
+            j=0
+            do k=0,h-1
+                j = ieor(j, (lshift(iand(rshift(i,k),1),h-1-k)))
+            end do
+            if (i < j)then
+                call swap(re_x(i+1),re_x(j+1))
+                call swap(im_x(i+1),im_x(j+1))
+            end if
         end do
     end subroutine
+
+
 
 
     subroutine convolution(f,g,x)
@@ -187,62 +188,16 @@ contains
     function auto_correlation_function(a,n) result(x)
         real(real64),intent(in):: a(:)
         integer(int32),intent(in):: n
-        real(real64),allocatable:: x(:), x2(:), rx2(:), a2(:), ra2(:)
+        real(real64),allocatable:: x(:), a2(:), ra2(:)
+        integer(int32):: n2,i
 
-        allocate(a2(2*n),ra2(2*n),source=0d0)
-        a2(1:size(a)) = a(:)
+        n2 = 2*n
+        allocate(a2, source=[a,(0d0,i=1,n2-size(a))])
+        allocate(ra2(n2),source=0d0)
         call fft_2(a2,ra2)
-        allocate(x2, source=a2(:)*a2(:) + ra2(:)*ra2(:))
-        deallocate(a2,ra2)
-        allocate(rx2(2*n), source=0d0)
-        call ifft_2(x2, rx2)
-        allocate(x, source=x2(1:size(a)))
+        a2(:) = a2(:)*a2(:) + ra2(:)*ra2(:)
+        ra2(:) = 0d0
+        call ifft_2(a2, ra2)
+        allocate(x(size(a)), source=a2(1:size(a)))
     end function
 end module fft_2_mod
-
-
-program main
-    use fft_2_mod
-    use,intrinsic :: iso_fortran_env
-    implicit none
-    real(real64), allocatable:: a(:),b(:),c(:)
-    integer(int32):: i,n,nn
-
-    print*, 'please input array length'
-    read*, n
-    allocate(a(n), source=[(real(i,kind=real64),i=1,n)])
-    allocate(b(n),c(n))
-    print'(a)', repeat("=",20), "input", repeat("=",20)
-    print'(*(e10.3))', a(:)
-    nn=2
-    do while(nn < n)
-        nn = nn*2
-    end do
-
-    b = auto_correlation_function(a,nn) ! 整数nnはsize(a)より大きい最小の2のべき乗
-    c = auto_correlation_function_non_fft(a)
-    if (n < 100) then
-        print'(a)', repeat("=",20), "result-fft", repeat("=",20)
-        print'(*(e10.3))', b(:)
-        print'(a)', repeat("=",20), "result-non-fft", repeat("=",20)
-        print'(*(e10.3))', c(:)
-    end if
-    print'(a)', repeat("=",20), "diff sum", repeat("=",20)
-    print*, sum(b(:)-c(:))
-    
-contains
-    function auto_correlation_function_non_fft(a) result(x)
-        real(real64),intent(in):: a(:)
-        real(real64),allocatable:: x(:)
-        integer(int32):: t,n,tau
-
-        n = size(a)
-        allocate(x(0:n-1), source=0d0)
-
-        do tau=0,n-1
-            do t=1,n-tau
-                x(tau) = x(tau) + a(t)*a(t+tau)
-            end do
-        end do
-    end function
-end program main
