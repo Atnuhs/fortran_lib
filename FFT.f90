@@ -9,88 +9,67 @@ module fft_2_mod
     public:: auto_correlation_function
     
 contains
-    subroutine swap(x,y)
-        real(real64),intent(inout):: x,y
+
+    subroutine fft_2(ar, ai)
+        real(real64), intent(inout):: ar(:)
+        real(real64), intent(inout):: ai(:)
+
+        call fft_2_bit_rev(ar, ai)
+        call fft_2_calc(ar, ai, .false.)
+    end subroutine
+
+
+    subroutine ifft_2(ar, ai)
+        real(real64), intent(inout):: ar(:)
+        real(real64), intent(inout):: ai(:)
+
+        call fft_2_bit_rev(ar, ai)
+        call fft_2_calc(ar, ai, .true.)
+        ar = ar/dble(size(ar))
+    end subroutine
+
+
+    subroutine fft_2_calc(ar, ai, inv)
+        real(real64), intent(inout):: ar(:), ai(:)
+        real(real64):: xr, xi, yr, yi, wr, wi, theta
+        integer(int32):: n,dist,j,i1,i2
+        logical:: inv
+
+        n = size(ar)
+        dist=1
+        theta = pi2
+        do while(dist < n)! half block size
+            theta=theta*0.5d0
+            do j=1,dist
+                wr = cos(theta*(j-1))
+                wi = -sin(theta*(j-1))
+                if (inv) wi = -wi
+                do i1=j, n-1, lshift(dist,1)
+                    i2 = i1+dist
+
+                    xr = ar(i1)
+                    xi = ai(i1)
+
+                    yr = ar(i2)*wr - ai(i2)*wi
+                    yi = ar(i2)*wi + ai(i2)*wr
+
+                    ar(i1) = xr + yr
+                    ai(i1) = xi + yi
+                    ar(i2) = xr - yr
+                    ai(i2) = xi - yi
+                end do
+            end do
+            dist=lshift(dist,1)
+        end do
+    end subroutine
+
+
+    subroutine fft_2_bit_rev(ar, ai)
+        real(real64), intent(inout):: ar(:), ai(:)
+        integer(int32)::n,i,j,k,h
         real(real64):: t
-        t=x; x=y; y=t
-    end subroutine
 
-    subroutine fft_2(re_x, im_x)
-        real(real64), intent(inout):: re_x(:)
-        real(real64), intent(inout):: im_x(:)
-        integer(int32):: n,i
-        real(real64):: inv_n
-        real(real64), allocatable:: re_w(:), im_w(:)
-
-        ! n == 2^i
-        n = size(re_x)
-        allocate(re_w(n/2), im_w(n/2))
-
-        inv_n = 1d0/dble(n)
-        do i=1,n/2
-            re_w(i) = cos(pi2*dble(i-1)*inv_n)
-            im_w(i) = -sin(pi2*dble(i-1)*inv_n)
-        end do
-
-        call fft_2_calc(re_x, im_x, re_w, im_w, n)
-        call fft_2_bit_rev(re_x, im_x, n)
-    end subroutine
-
-
-    subroutine ifft_2(re_x, im_x)
-        real(real64), intent(inout):: re_x(:)
-        real(real64), intent(inout):: im_x(:)
-        integer(int32):: n,i
-        real(real64):: inv_n
-        real(real64), allocatable:: re_w(:), im_w(:)
-
-        ! n == 2^i
-
-        n = size(re_x)
-        allocate(re_w(n/2), im_w(n/2))
-
-        inv_n = 1d0/dble(n)
-        do i=1,n/2
-            re_w(i) = cos(pi2*dble(i-1)*inv_n)
-            im_w(i) = sin(pi2*dble(i-1)*inv_n)
-        end do
-
-        call fft_2_calc(re_x, im_x, re_w, im_w, n)
-        call fft_2_bit_rev(re_x, im_x, n)
-        re_x = re_x/n
-    end subroutine
-
-
-    recursive subroutine fft_2_calc(re_x, im_x, re_w, im_w, n)
-        integer(int32),intent(in):: n
-        real(real64), intent(inout):: re_x(:), im_x(:)
-        real(real64), intent(in):: re_w(:), im_w(:)
-        real(real64):: re_xi, im_xi, re_xj, im_xj
-        integer(int32):: hn,i,j
-
-        hn = n/2
-
-        do i=1,hn
-            j = hn+i
-            re_xi = re_x(i); im_xi = im_x(i)
-            re_xj = re_x(j); im_xj = im_x(j)
-
-            re_x(i) = re_xi + re_xj; im_x(i) = im_xi + im_xj
-
-            re_x(j) = (re_xi-re_xj)*re_w(i) - (im_xi-im_xj)*im_w(i)
-            im_x(j) = (re_xi-re_xj)*im_w(i) + (im_xi-im_xj)*re_w(i)
-        end do
-        if (hn==1) return
-        call fft_2_calc(re_x(1:hn), im_x(1:hn), re_w(1:hn:2), im_w(1:hn:2), hn)
-        call fft_2_calc(re_x(hn+1:n), im_x(hn+1:n), re_w(1:hn:2), im_w(1:hn:2), hn)
-    end subroutine
-
-
-    subroutine fft_2_bit_rev(re_x, im_x, n)
-        integer(int32), intent(in):: n
-        real(real64), intent(inout):: re_x(:), im_x(:)
-        integer(int32)::i,j,k,h
-
+        n=size(ar)
         h=0
         do while(lshift(1,h) < n)
             h=h+1
@@ -98,104 +77,108 @@ contains
         do i=0,n-1
             j=0
             do k=0,h-1
-                j = ieor(j, (lshift(iand(rshift(i,k),1),h-1-k)))
+                j = ieor(j, (lshift(iand(rshift(i, k), 1), h-1-k)))
             end do
             if (i < j)then
-                call swap(re_x(i+1),re_x(j+1))
-                call swap(im_x(i+1),im_x(j+1))
+                t = ar(i+1)
+                ar(i+1)=ar(j+1)
+                ar(j+1)=t
+
+                t = ai(i+1)
+                ai(i+1) = ai(j+1)
+                ai(j+1)=t
             end if
         end do
     end subroutine
 
 
-
-
-    subroutine convolution(f,g,x)
-        real(real64), intent(inout):: f(:),g(:),x(:)
-        real(real64), allocatable:: rf(:),rg(:),rx(:)
+    subroutine convolution(fr,gr,xr)
+        real(real64), intent(inout):: fr(:),gr(:),xr(:)
+        real(real64), allocatable:: fi(:),gi(:),xi(:)
         integer(int32):: n
 
-        n = size(f)
-        allocate(rf(n), rg(n), rx(n), source=0d0)
-        call fft_2(f,rf)
-        call fft_2(g,rg)
-        x(:) = f(:)*g(:) - rf(:)*rg(:)
-        rx(:) = f(:)*rg(:) + rf(:)*g(:)
-        call ifft_2(x,rx)
+        n = size(fr)
+        allocate(fi(n), gi(n), xi(n), source=0d0)
+        call fft_2(fr,fi)
+        call fft_2(gr,gi)
+        xr(:) = fr(:)*gr(:) - fi(:)*gi(:)
+        xi(:) = fr(:)*gi(:) + fi(:)*gr(:)
+        call ifft_2(xr,xi)
     end subroutine
 
 
-    subroutine liner_convolution(f,g,x)
-        real(real64), intent(in):: f(:),g(:)
-        real(real64), intent(out):: x(:)
-        real(real64), allocatable:: f2(:), g2(:), x2(:)
+    subroutine liner_convolution(fr,gr,xr)
+        real(real64), intent(in):: fr(:),gr(:)
+        real(real64), intent(out):: xr(:)
+        real(real64), allocatable:: fr2(:), gr2(:), xr2(:)
         integer(int32):: n
 
-        n = 2
-        do while(n < size(f))
-            n=n*2
+        n = 1
+        do while(n < size(fr))
+            n=lshift(n,1)
         end do
 
-        allocate(f2(2*n), g2(2*n), x2(2*n), source=0d0)
-        f2(1:size(f)) = f(:)
-        g2(1:size(g)) = g(:)
+        allocate(fr2(2*n), gr2(2*n), xr2(2*n), source=0d0)
+        fr2(1:size(fr)) = fr(:)
+        gr2(1:size(gr)) = gr(:)
 
-        call convolution(f2,g2,x2)
-        x(:) = x2(1:size(x))
+        call convolution(fr2,gr2,xr2)
+        xr(:) = xr2(1:size(xr))
     end subroutine
 
 
-    subroutine correlation(f,g,x)
-        real(real64), intent(inout):: f(:),g(:)
-        real(real64), intent(out):: x(:)
-        real(real64), allocatable:: rf(:),rg(:),rx(:)
+    subroutine correlation(fr,gr,xr)
+        real(real64), intent(inout):: fr(:),gr(:)
+        real(real64), intent(out):: xr(:)
+        real(real64), allocatable:: fi(:),gi(:),xi(:)
         integer(int32):: n
 
-        n = size(f)
-        allocate(rf(n), rg(n), rx(n), source=0d0)
+        n = size(fr)
+        allocate(fi(n), gi(n), xi(n), source=0d0)
 
-        call fft_2(f,rf)
-        call fft_2(g,rg)
-        rf(:) = -rf(:)
-        x(:) = f(:)*g(:) - rf(:)*rg(:)
-        rx(:) = f(:)*rg(:) + rf(:)*g(:)
-        call ifft_2(x,rx)
+        call fft_2(fr,fi)
+        call fft_2(gr,gi)
+        fi(:) = -fi(:)
+        xr(:) = fr(:)*gr(:) - fi(:)*gi(:)
+        xi(:) = fr(:)*gi(:) + fi(:)*gr(:)
+        call ifft_2(xr,xi)
     end subroutine
 
 
-    subroutine liner_correlation(f,g,x)
-        real(real64), intent(in):: f(:),g(:)
-        real(real64), intent(out):: x(:)
-        real(real64), allocatable:: f2(:), g2(:), x2(:)
+    subroutine liner_correlation(fr,gr,xr)
+        real(real64), intent(in):: fr(:),gr(:)
+        real(real64), intent(out):: xr(:)
+        real(real64), allocatable:: fr2(:), gr2(:), xr2(:)
         integer(int32):: n
 
-        n = 2
-        do while(n < size(f))
-            n=n*2
+        n = 1
+        do while(n < size(fr))
+            n=lshift(n,1)
         end do
 
-        allocate(f2(2*n), g2(2*n), x2(2*n), source=0d0)
-        f2(1:size(f)) = f(:)
-        g2(1:size(g)) = g(:)
+        allocate(fr2(2*n), gr2(2*n), xr2(2*n), source=0d0)
+        fr2(1:size(fr)) = fr(:)
+        gr2(1:size(gr)) = gr(:)
 
-        call correlation(f2,g2,x2)
-        x(:) = x2(1:size(x))
+        call correlation(fr2,gr2,xr2)
+        xr(:) = xr2(1:size(xr))
     end subroutine
 
 
-    function auto_correlation_function(a,n) result(x)
-        real(real64),intent(in):: a(:)
+    function auto_correlation_function(ar,n) result(xr)
+        real(real64),intent(in):: ar(:)
         integer(int32),intent(in):: n
-        real(real64),allocatable:: x(:), a2(:), ra2(:)
+        real(real64),allocatable:: xr(:), ar2(:), ai2(:)
         integer(int32):: n2,i
 
         n2 = 2*n
-        allocate(a2, source=[a,(0d0,i=1,n2-size(a))])
-        allocate(ra2(n2),source=0d0)
-        call fft_2(a2,ra2)
-        a2(:) = a2(:)*a2(:) + ra2(:)*ra2(:)
-        ra2(:) = 0d0
-        call ifft_2(a2, ra2)
-        allocate(x(size(a)), source=a2(1:size(a)))
+        allocate(ar2(n2))
+        ar2(1:size(ar)) = ar(:); ar2(size(ar):) = 0d0
+        allocate(ai2(n2), source=0d0)
+        call fft_2(ar2, ai2)
+        ar2(:) = ar2(:)*ar2(:) + ai2(:)*ai2(:)
+        ai2(:) = 0d0
+        call ifft_2(ar2, ai2)
+        allocate(xr(size(ar)), source=ar2(1:size(ar)))
     end function
 end module fft_2_mod
