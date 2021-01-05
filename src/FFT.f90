@@ -31,33 +31,65 @@ contains
 
     subroutine fft_2_calc(ar, ai, inv)
         real(real64), intent(inout):: ar(:), ai(:)
-        real(real64):: xr, xi, wr, wi, theta
-        integer(int32):: n,dist,j,i1,i2
+        real(real64):: theta
+        real(real64):: b0r,b0i,b1r,b1i,b2r,b2i,b3r,b3i
+        real(real64):: cr, ci
+        real(real64):: w1r,w1i,w2r,w2i, w3r,w3i
+        integer(int32):: n,j,dist,d2
+        integer(int32):: i0,i1,i2,i3
         logical:: inv
 
         n = size(ar)
-        dist=n/2
-        theta = pi2/(dist*2)
+        dist = n/4
+        d2 = n/2
+        theta = pi2/(dist*4)
+
         do while(dist >= 1)! half block size
             do j=1,dist
-                wr = cos(theta*(j-1))
-                wi = sin(theta*(j-1))
-                if (inv) wi = -wi
-                do i1=j, n-1, lshift(dist,1)
-                    i2 = i1+dist
-                    
-                    xr = ar(i1) - ar(i2)
-                    xi = ai(i1) - ai(i2)
+                w1r = cos(theta*(j-1)); w1i = sin(theta*(j-1))
+                w2r = cos(2*theta*(j-1)); w2i = sin(2*theta*(j-1))
+                w3r = cos(3*theta*(j-1)); w3i = sin(3*theta*(j-1))
 
-                    ar(i1) = ar(i1) + ar(i2)
-                    ai(i1) = ai(i1) + ai(i2)
-                    ar(i2) = wr*xr - wi*xi
-                    ai(i2) = wr*xi + wi*xr
+                if (inv)then
+                    w1i = -w1i
+                    w2i = -w2i
+                    w3i = -w3i
+                end if
+                do i0=j, n, lshift(dist,2)
+                    i1 = i0+dist
+                    i2 = i1+dist
+                    i3 = i2+dist
+
+                    b0r = ar(i0)+ar(i2); b0i = ai(i0)+ai(i2)
+                    b1r = ar(i1)+ar(i3); b1i = ai(i1)+ai(i3)
+                    b2r = ar(i0)-ar(i2); b2i = ai(i0)-ai(i2)
+                    b3r = ar(i1)-ar(i3); b3i = ai(i1)-ai(i3)
+                    
+                    ar(i0) = b0r+b1r; ai(i0) = b0i+b1i
+                    cr = b0r-b1r; ci = b0i-b1i
+                    ar(i1) = cr*w2r-ci*w2i; ai(i1) = cr*w2i+ci*w2r
+                    cr = b2r-b3i; ci = b2i+b3r
+                    ar(i2) = cr*w1r-ci*w1i; ai(i2) = cr*w1i+ci*w1r
+                    cr = b2r+b3i; ci = b2i-b3r
+                    ar(i3) = cr*w3r-ci*w3i; ai(i3) = cr*w3i+ci*w3r
                 end do
             end do
-            theta=theta*2d0
-            dist=rshift(dist,1)
+            theta=theta*4d0
+            dist=rshift(dist,2)
+            d2=rshift(d2,2)
         end do
+
+        if (d2 == 1) then
+            do i0=1,n-1,2
+                i1 = i0+1
+                b0r = ar(i0)-ar(i1)
+                b0i = ai(i0)-ai(i1)
+                ar(i0) = ar(i0)+ar(i1)
+                ai(i0) = ai(i0)+ai(i1)
+                ar(i1) = b0r
+                ai(i1) = b0i
+            end do
+        end if
     end subroutine
 
 

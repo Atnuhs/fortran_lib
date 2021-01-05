@@ -6,7 +6,7 @@ program test_fft
     integer(int32):: n, n2, i
     real(real64),allocatable:: a(:), b(:), c(:), d(:)
 
-    n = 100
+    n = 3
     n2 = 1
     do while (n2 < n)
         n2 = n2*2
@@ -20,7 +20,7 @@ program test_fft
 
     open(unit=10, file="fft_debug", status="replace")
     write(10,'(a)') 'i, source, acffft, lcfft, nonfft (should be -> acffft == lcfft == nonfft)'
-        do i=1,10
+        do i=1,min(10,n)
             write(10,*) i, a(i), b(i), c(i), d(i)
         end do
     write(10,'(a)') 'sum of... acffft, lcfft, nonfft (should be -> acffft == lcfft == nonfft)'
