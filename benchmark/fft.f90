@@ -2,98 +2,72 @@ program bench_fft
     use,intrinsic :: iso_fortran_env
     use fft_2_mod
     implicit none
+    abstract interface
+    function acf(ar,n)
+        use,intrinsic :: iso_fortran_env
+        implicit none
+        real(real64),intent(in):: ar(:)
+        real(real64):: acf(size(ar))
+        integer(int32),intent(in):: n
+    end function
+end interface
     integer(int32):: n, i
+    real(real64):: t1,t2,t3
 
     read*, n
     i=1
     open(unit=11, file='fft_bench_result.txt', status='replace')
         do while (i <= n)
-            call benchmark(i)
+            write(*,'(i10)',advance="no") i
+            t1 = benchmark(auto_correlation_function, i)
+            write(*,'(e15.6)',advance="no") t1
+            t2 = benchmark(auto_correlation_function_non_fft, i)
+            write(*,'(e15.6)',advance="no") t2
+            t3 = benchmark(auto_correlation_function_non_fft_vectorized, i)
+            write(*,'(e15.6)') t3
+            write(11,*) i, t1, t2, t3
             i=lshift(i,1)
         end do
     close(11)
 contains
-    subroutine benchmark(n)
-        integer(int32):: n, i,nexc
-        integer(int32),parameter:: maxexc=10000
-        real(real64):: t1, t2, t3
-        real(real64),parameter:: maxt=2d-1
+    function benchmark(f,n) result(time)
+        procedure(acf):: f
+        real(real64):: time
+        real(real64),parameter:: maxtime=0.1d0
+        real(real64):: ar(n)
+        integer(int32):: i, n, n2
 
-        t1 = bench_acf(n)
-        if (t1 < maxt) then
-            nexc=maxexc
-            if (t1 > 0d0) nexc=min(int(maxt/t1), nexc)
-            do i=1,nexc
-                t1 = t1 + bench_acf(n)
-            end do
-            t1=t1/real(nexc,kind=real64)
-        end if
-
-        t2 = bench_acf_nonfft(n)
-        if (t2 < maxt) then
-            nexc=maxexc
-            if (t2 > 0d0) nexc=min(int(maxt/t2), nexc)
-            do i=1,nexc
-                t2 = t2 + bench_acf_nonfft(n)
-            end do
-            t2=t2/real(nexc,kind=real64)
-        end if
-        
-        t3 = bench_acf_non_fft_vectorized(n)
-        if (t3 < maxt) then
-            nexc=maxexc
-            if (t3 > 0d0) nexc=min(int(maxt/t3), nexc)
-            do i=1,nexc
-                t3 = t3 + bench_acf_non_fft_vectorized(n)
-            end do
-            t3=t3/real(nexc,kind=real64)
-        end if
-
-        write(11,*) n, t1, t2, t3
-        print*, n, t1, t2, t3
-    end subroutine
-
-
-    function bench_acf(n) result(time)
-        integer(int32):: n,n2,i
-        real(real64):: a(n), b(n), time, time_begin, time_end
-
+        time = 0d0
+        i=0
+        ar(:) = [(i, i=1,n)]
         n2 = 1
         do while (n2 < n)
             n2 = n2*2
         end do
-        a(:) = [(real(i, kind=real64), i=1,n)]
+
+        do while(time <= maxtime)
+            time = time + bench_sub(f,ar,n2)
+            i=i+1
+        end do
+        time = time/real(i,kind=real64)
+    end function
+
+
+    function bench_sub(f,ar,n) result(time)
+        procedure(acf):: f
+        integer(int32):: n
+        real(real64):: time, time_begin, time_end
+        real(real64):: ar(:), b(size(ar))
+
         call cpu_time(time_begin)
-        b(:) = auto_correlation_function(a, n)
+        b(:) = f(ar, n)
         call cpu_time(time_end)
         time = time_end - time_begin
     end function
 
-    function bench_acf_nonfft(n) result(time)
-        integer(int32):: n,n2,i
-        real(real64):: a(n), b(n), time, time_begin, time_end
-
-        a(:) = [(real(i, kind=real64), i=1,n)]
-        call cpu_time(time_begin)
-        b(:) = auto_correlation_function_non_fft(a)
-        call cpu_time(time_end)
-        time = time_end - time_begin
-    end function
-
-    function bench_acf_non_fft_vectorized(n) result(time)
-        integer(int32):: n,n2,i
-        real(real64):: a(n), b(n), time, time_begin, time_end
-
-        a(:) = [(real(i, kind=real64), i=1,n)]
-        call cpu_time(time_begin)
-        b(:) = auto_correlation_function_non_fft_vectorized(a)
-        call cpu_time(time_end)
-        time = time_end - time_begin
-    end function
-
-
-    function auto_correlation_function_non_fft(ar) result(ret)
-        real(real64):: ar(:)
+    function auto_correlation_function_non_fft(ar, tmp) result(ret)
+        real(real64),intent(in):: ar(:)
+        integer(int32),intent(in):: tmp
         real(real64):: ret(size(ar))
         integer(int32):: d, i, n
         
@@ -107,8 +81,9 @@ contains
     end function
 
 
-    function auto_correlation_function_non_fft_vectorized(ar) result(ret)
-        real(real64):: ar(:)
+    function auto_correlation_function_non_fft_vectorized(ar, tmp) result(ret)
+        real(real64),intent(in):: ar(:)
+        integer(int32),intent(in):: tmp
         real(real64):: ret(size(ar))
         integer(int32):: d, i, n
         

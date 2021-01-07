@@ -34,54 +34,78 @@ contains
         real(real64):: theta
         real(real64):: b0r,b0i,b1r,b1i,b2r,b2i,b3r,b3i
         real(real64):: cr, ci
-        real(real64):: w1r,w1i,w2r,w2i, w3r,w3i
-        integer(int32):: n,j,dist,d2
+        real(real64):: w1r,w1i,w2r,w2i,w3r,w3i
+        integer(int32):: n,j,mq,m
         integer(int32):: i0,i1,i2,i3
         logical:: inv
 
+        print'(a)', '##### fft_2_calc'
         n = size(ar)
-        dist = n/4
-        d2 = n/2
-        theta = pi2/(dist*4)
+        m = n
+        mq = rshift(m,2)
+        theta = -pi2/m
 
-        do while(dist >= 1)! half block size
-            do j=1,dist
-                w1r = cos(theta*(j-1)); w1i = sin(theta*(j-1))
-                w2r = cos(2*theta*(j-1)); w2i = sin(2*theta*(j-1))
-                w3r = cos(3*theta*(j-1)); w3i = sin(3*theta*(j-1))
+        do while(mq >= 1)! half block size
+
+            print'(a)', repeat("=",5)
+            print*, m,mq
+            do j=0,mq-1
+                w1r = cos(theta*j)
+                w1i = sin(theta*j)
+                w2r = cos(2*theta*j)
+                w2i = sin(2*theta*j)
+                w3r = cos(3*theta*j)
+                w3i = sin(3*theta*j)
 
                 if (inv)then
                     w1i = -w1i
                     w2i = -w2i
                     w3i = -w3i
                 end if
-                do i0=j, n, lshift(dist,2)
-                    i1 = i0+dist
-                    i2 = i1+dist
-                    i3 = i2+dist
 
-                    b0r = ar(i0)+ar(i2); b0i = ai(i0)+ai(i2)
-                    b1r = ar(i1)+ar(i3); b1i = ai(i1)+ai(i3)
-                    b2r = ar(i0)-ar(i2); b2i = ai(i0)-ai(i2)
-                    b3r = ar(i1)-ar(i3); b3i = ai(i1)-ai(i3)
+                do i0=j+1, n, m
+                    i1 = i0+mq
+                    i2 = i1+mq
+                    i3 = i2+mq
+                    print*, i0,i1,i2,i3
+
+                    b0r = ar(i0)+ar(i2)
+                    b0i = ai(i0)+ai(i2)
+                    b1r = ar(i0)-ar(i2)
+                    b1i = ai(i0)-ai(i2)
+                    b2r = ar(i1)+ar(i3)
+                    b2i = ai(i1)+ai(i3)
+                    b3r = ai(i3)-ai(i1)
+                    b3i = ar(i1)-ar(i3)
                     
-                    ar(i0) = b0r+b1r; ai(i0) = b0i+b1i
-                    cr = b0r-b1r; ci = b0i-b1i
-                    ar(i1) = cr*w2r-ci*w2i; ai(i1) = cr*w2i+ci*w2r
-                    cr = b2r-b3i; ci = b2i+b3r
-                    ar(i2) = cr*w1r-ci*w1i; ai(i2) = cr*w1i+ci*w1r
-                    cr = b2r+b3i; ci = b2i-b3r
-                    ar(i3) = cr*w3r-ci*w3i; ai(i3) = cr*w3i+ci*w3r
+                    ar(i0) = b0r+b2r
+                    ai(i0) = b0i+b2i
+                    cr = b0r-b2r
+                    ci = b0i-b2i
+                    ar(i1) = cr*w2r-ci*w2i
+                    ai(i1) = cr*w2i+ci*w2r
+                    cr = b1r+b3r
+                    ci = b1i+b3i
+                    ar(i2) = cr*w1r-ci*w1i
+                    ai(i2) = cr*w1i+ci*w1r
+                    cr = b1r-b3r
+                    ci = b1i-b3i
+                    ar(i3) = cr*w3r-ci*w3i
+                    ai(i3) = cr*w3i+ci*w3r
+
+                    call swap_comp(ar(i1),ai(i1),ar(i2),ai(i2))
                 end do
             end do
             theta=theta*4d0
-            dist=rshift(dist,2)
-            d2=rshift(d2,2)
+            m=mq
+            mq = rshift(m,2)
         end do
-
-        if (d2 == 1) then
-            do i0=1,n-1,2
+        print*, mq, m
+        if (m == 2) then
+            print'(a)', "+++++++++++"
+            do i0=1,n,2
                 i1 = i0+1
+                print*, i0, i1
                 b0r = ar(i0)-ar(i1)
                 b0i = ai(i0)-ai(i1)
                 ar(i0) = ar(i0)+ar(i1)
@@ -91,12 +115,10 @@ contains
             end do
         end if
     end subroutine
-
-
+    
     subroutine fft_2_bit_rev(ar, ai)
         real(real64), intent(inout):: ar(:), ai(:)
         integer(int32)::n,i,j,k,h
-        real(real64):: t
 
         n=size(ar)
         h=0
@@ -109,15 +131,18 @@ contains
                 j = ieor(j, (lshift(iand(rshift(i, k), 1), h-1-k)))
             end do
             if (i < j)then
-                t = ar(i+1)
-                ar(i+1)=ar(j+1)
-                ar(j+1)=t
-
-                t = ai(i+1)
-                ai(i+1) = ai(j+1)
-                ai(j+1)=t
+                call swap_comp(ar(i+1),ai(i+1),ar(j+1),ai(j+1))
             end if
         end do
+    end subroutine
+
+    subroutine swap_comp(xr, xi, yr, yi)
+        real(real64),intent(inout):: xr,xi,yr,yi
+        real(real64):: tr,ti
+
+        tr=xr; ti=xi
+        xr=yr; xi=yi
+        yr=tr; yi=ti
     end subroutine
 
 
@@ -196,17 +221,17 @@ contains
     function auto_correlation_function(ar,n) result(xr)
         real(real64),intent(in):: ar(:)
         integer(int32),intent(in):: n
-        real(real64),allocatable:: xr(:), ar2(:), ai2(:)
+        real(real64):: xr(size(ar)), ar2(n*2), ai2(n*2)
         integer(int32):: n2
 
         n2 = 2*n
-        allocate(ar2(n2))
-        ar2(1:size(ar)) = ar(:); ar2(size(ar)+1:) = 0d0
-        allocate(ai2(n2), source=0d0)
+        ar2(1:size(ar)) = ar(:)
+        ar2(size(ar)+1:) = 0d0
+        ai2(:) = 0d0
         call fft_2(ar2, ai2)
         ar2(:) = ar2(:)*ar2(:) + ai2(:)*ai2(:)
         ai2(:) = 0d0
         call ifft_2(ar2, ai2)
-        allocate(xr(size(ar)), source=ar2(1:size(ar)))
+        xr(:) = ar2(1:size(ar))
     end function
 end module fft_2_mod
