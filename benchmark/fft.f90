@@ -1,14 +1,13 @@
 program bench_fft
     use,intrinsic :: iso_fortran_env
-    use fft_2_mod
+    use fft_mod
     implicit none
     abstract interface
-    function acf(ar,n)
+    function acf(ar)
         use,intrinsic :: iso_fortran_env
         implicit none
         real(real64),intent(in):: ar(:)
         real(real64):: acf(size(ar))
-        integer(int32),intent(in):: n
     end function
 end interface
     integer(int32):: n, i
@@ -20,7 +19,7 @@ end interface
     open(unit=11, file='fft_bench_result.txt', status='replace')
         do while (i <= n)
             write(*,'(i10)',advance="no") i
-            t1 = benchmark(auto_correlation_function, i)
+            t1 = bench_fftacf(i)
             write(*,'(e15.6)',advance="no") t1
             t2 = benchmark(auto_correlation_function_non_fft, i)
             write(*,'(e15.6)',advance="no") t2
@@ -31,6 +30,35 @@ end interface
         end do
     close(11)
 contains
+    function bench_fftacf(n) result(time)
+        real(real64):: time
+        real(real64),parameter:: maxtime=0.1d0
+        real(real64):: ar(n)
+        integer(int32):: i, n, n2
+
+        time = 0d0
+        i=0
+        ar(:) = [(i, i=1,n)]
+        call init_acf(n)
+
+        do while(time <= maxtime)
+            time = time + bench_sub_fftacf(ar)
+            i=i+1
+        end do
+        time = time/real(i,kind=real64)
+        write(*,'(i10)',advance="no") i
+    end function
+
+    function bench_sub_fftacf(ar) result(time)
+        real(real64):: time, time_begin, time_end
+        real(real64):: ar(:), b(size(ar))
+
+        call cpu_time(time_begin)
+        b(:) = auto_correlation_function(ar)
+        call cpu_time(time_end)
+        time = time_end - time_begin
+    end function
+
     function benchmark(f,n) result(time)
         procedure(acf):: f
         real(real64):: time
@@ -62,14 +90,13 @@ contains
         real(real64):: ar(:), b(size(ar))
 
         call cpu_time(time_begin)
-        b(:) = f(ar, n)
+        b(:) = f(ar)
         call cpu_time(time_end)
         time = time_end - time_begin
     end function
 
-    function auto_correlation_function_non_fft(ar, tmp) result(ret)
+    function auto_correlation_function_non_fft(ar) result(ret)
         real(real64),intent(in):: ar(:)
-        integer(int32),intent(in):: tmp
         real(real64):: ret(size(ar))
         integer(int32):: d, i, n
         
@@ -83,9 +110,8 @@ contains
     end function
 
 
-    function auto_correlation_function_non_fft_vectorized(ar, tmp) result(ret)
+    function auto_correlation_function_non_fft_vectorized(ar) result(ret)
         real(real64),intent(in):: ar(:)
-        integer(int32),intent(in):: tmp
         real(real64):: ret(size(ar)), ari
         integer(int32):: d, i, j, n
         

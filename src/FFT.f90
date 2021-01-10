@@ -1,25 +1,24 @@
-module fft_calc_class
+module fft_2based_class
     use,intrinsic :: iso_fortran_env
     implicit none
     real(real64),parameter:: pi = acos(-1d0), pi2 = 2d0*pi
     private
-    public:: fft_calc, fft, ifft
-    type:: fft_calc
+    public:: fft_2based, fft, ifft
+    type:: fft_2based
         integer(int32):: l, hl, n, bit_len
         real(real64),allocatable:: wr(:),wi(:)
-        logical,private:: initialized = .false.
     contains
         procedure,private:: set_w
         procedure,private:: calc
         procedure:: fft,ifft
     end type
-    interface fft_calc
-        module procedure:: init_fft_interface
+    interface fft_2based
+        module procedure:: init_fft_calc
     end interface
 contains
-    function init_fft_interface(array_len) result(fftc)
+    function init_fft_calc(array_len) result(fftc)
         integer(int32),intent(in):: array_len
-        type(fft_calc):: fftc
+        type(fft_2based):: fftc
 
         fftc%l = array_len
         fftc%hl = fftc%l/2
@@ -31,15 +30,15 @@ contains
         fftc%n = lshift(1,fftc%bit_len)
         ! print*, fftc%l, fftc%hl, fftc%n, fftc%bit_len
         call fftc%set_w()
-        fftc%initialized = .true.
     end function
 
-
     subroutine set_w(fftc)
-        class(fft_calc):: fftc
+        class(fft_2based):: fftc
         real(real64):: theta
         integer(int32):: i,hn
 
+        if (allocated(fftc%wr)) deallocate(fftc%wr)
+        if (allocated(fftc%wi)) deallocate(fftc%wi)
         hn = rshift(fftc%n,1)
         allocate(fftc%wr(0:hn-1), fftc%wi(0:hn-1))
         
@@ -91,16 +90,16 @@ contains
 
 
     subroutine fft(fftc,ar,ai)
-        class(fft_calc),intent(inout):: fftc
+        class(fft_2based),intent(inout):: fftc
         real(real64):: ar(fftc%n),ai(fftc%n)
 
-        call it_rev(ar,ai,fftc%n,fftc%bit_len)
+        call bit_rev(ar,ai,fftc%n,fftc%bit_len)
         call fftc%calc(ar,ai,.false.)
     end subroutine
 
 
     subroutine ifft(fftc,ar,ai)
-        class(fft_calc),intent(inout):: fftc
+        class(fft_2based),intent(inout):: fftc
         real(real64):: ar(fftc%n),ai(fftc%n)
 
         call bit_rev(ar,ai,fftc%n,fftc%bit_len)
@@ -111,7 +110,7 @@ contains
 
 
     subroutine calc(fftc, ar, ai, inv)
-        class(fft_calc),intent(inout):: fftc
+        class(fft_2based),intent(inout):: fftc
         real(real64):: ar(fftc%n), ai(fftc%n)
         real(real64):: xr,xi,wkr,wki
         integer(int32):: m, hm, k, i,hi, j, t
@@ -148,9 +147,9 @@ end module
 
 module fft_mod
     use,intrinsic :: iso_fortran_env
-    use fft_calc_class
+    use fft_2based_class
     implicit none
-    type(fft_calc):: fftc
+    type(fft_2based):: fftc
     private
     public:: init_fft, init_conv, init_corr, init_acf
     public:: fft2, ifft2
@@ -163,28 +162,28 @@ contains
     subroutine init_fft(array_size)
         integer(int32),intent(in):: array_size
 
-        fftc = fft_calc(array_size)
+        fftc = fft_2based(array_size)
     end subroutine
 
 
     subroutine init_conv(array_size)
         integer(int32),intent(in):: array_size
 
-        fftc = fft_calc(array_size*2)
+        fftc = fft_2based(array_size*2)
     end subroutine
 
 
     subroutine init_corr(array_size)
         integer(int32),intent(in):: array_size
 
-        fftc = fft_calc(array_size*2)
+        fftc = fft_2based(array_size*2)
     end subroutine
 
 
     subroutine init_acf(array_size)
         integer(int32),intent(in):: array_size
 
-        fftc = fft_calc(array_size*2)
+        fftc = fft_2based(array_size*2)
     end subroutine
 
 
@@ -201,7 +200,7 @@ contains
         call fftc%ifft(ar,ai)
     end subroutine
 
-    
+
     subroutine convolution(fr,gr,xr)
         real(real64), intent(inout):: fr(fftc%n),gr(fftc%n),xr(fftc%n)
         real(real64):: fi(fftc%n), gi(fftc%n), xi(fftc%n)
