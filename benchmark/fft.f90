@@ -16,6 +16,7 @@ end interface
 
     read*, n
     i=1
+    print*, 'a'
     open(unit=11, file='fft_bench_result.txt', status='replace')
         do while (i <= n)
             write(*,'(i10)',advance="no") i
@@ -50,6 +51,7 @@ contains
             i=i+1
         end do
         time = time/real(i,kind=real64)
+        write(*,'(i10)',advance="no") i
     end function
 
 
@@ -72,8 +74,8 @@ contains
         integer(int32):: d, i, n
         
         n = size(ar)
-        ret(:) = 0
         do d=0,n-1
+            ret(d+1) = 0d0
             do i=1,n-d
                 ret(d+1)=ret(d+1)+ar(i)*ar(i+d)
             end do
@@ -84,13 +86,20 @@ contains
     function auto_correlation_function_non_fft_vectorized(ar, tmp) result(ret)
         real(real64),intent(in):: ar(:)
         integer(int32),intent(in):: tmp
-        real(real64):: ret(size(ar))
-        integer(int32):: d, i, n
+        real(real64):: ret(size(ar)), ari
+        integer(int32):: d, i, j, n
         
         n = size(ar)
         ret(:) = 0
-        do d=0,n-1
-            ret(d+1) = sum([(ar(i)*ar(i+d), i=1, n-d)])
+        ! do d=0,n-1
+        !     ret(d+1) = sum([(ar(i)*ar(i+d), i=1, n-d)])
+        ! end do
+
+        do i=1,n
+            ari = ar(i)
+            do j=i,n
+                ret(j-i+1) = ret(j-i+1) + ari*ar(j)
+            end do  
         end do
     end function
 end program bench_fft

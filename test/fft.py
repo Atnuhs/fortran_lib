@@ -21,7 +21,6 @@ def main():
     subprocess.check_call(c)
     subprocess.check_call(['./a.out'])
 
-
 if __name__ == "__main__":
     os.chdir(Path(__file__).parent)
     main()
