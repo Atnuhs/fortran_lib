@@ -12,7 +12,7 @@ def main():
 
     c = [
         'gfortran',
-        '../src/FFT.f90',
+        '../../src/FFT.f90',
         'fft.f90',
         '-O2',
         '-xHost',

@@ -7,7 +7,7 @@ program test_fft
     real(real64),allocatable:: ar(:), ai(:), br(:), bi(:)
 
 
-    n = 1000
+    n = 111
     call init_fft(n)
     n2 = get_fft_len()
     allocate(ar(n2),source=[(dble(i), i=1, n2)])
