@@ -64,24 +64,4 @@ contains
 
         ret = sieve_vec%at(x) == x
     end function
-
-
-    function lcm(x,y) result(ret)
-        integer(int64),intent(in):: x,y
-        integer(int64):: ret
-
-        ret = x*y/gcd(x,y)
-    end function
-
-
-    recursive function gcd(x,y) result(ret)
-        integer(int64),intent(in):: x,y
-        integer(int64):: ret
-    
-        if (mod(x,y) == 0) then
-            ret = y
-            return
-        end if
-        ret = gcd(y,mod(x,y))
-    end function
 end module
