@@ -2,6 +2,8 @@ module string_mod
     use,intrinsic :: iso_fortran_env
     public
     integer(int32),private:: d = ichar("a") - ichar("A")
+    integer(int32),private:: c0 = ichar("0")
+
 contains
     function toupper(s) result(big_s)
         character(*),intent(in):: s
@@ -24,6 +26,15 @@ contains
         big_s = transfer(c,repeat(" ", size(c)))
     end function
 
+    function toint(s) result(v)
+        character(*),intent(in):: s
+        integer(int32):: v,i
+        v=0
+        do i=len_trim(s),1,-1
+            v=v+ichar(s(i:i))-c0
+            v=v*10
+        end do
+    end function
 
     function read_grid(w,h) result(s)
         ! how to use => "s = read_grid(w,h)"
