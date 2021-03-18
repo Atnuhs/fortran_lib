@@ -6,14 +6,14 @@ module heap_map_char_int_mod
     ! heap map
     use,intrinsic :: iso_fortran_env
     private
-    public:: to_char
-    type key
+    public:: key_to_char
+    type val
         character(:),allocatable:: v
     end type
     type, public:: heap_map_char_int
         integer(int32),private:: len
-        type(key),allocatable:: key(:)
-        integer(int64), allocatable,private:: val(:)
+        integer(int64), allocatable,private:: key(:)
+        type(val),allocatable:: val(:)
     contains
         procedure:: size => hm_size
         procedure:: remain => hm_remain
@@ -61,12 +61,14 @@ contains
         end select
     end function
 
-    function to_key(in_k) result(k)
-        class(*), intent(in):: in_k
-        type(key):: k
 
-        k = key(to_char(in_k))
+    function to_val(in_v) result(v)
+        class(*), intent(in):: in_v
+        type(val):: v
+
+        v = val(to_char(in_v))
     end function 
+    
 
 
     function init_hm() result(hm)
@@ -94,7 +96,7 @@ contains
         l = min(size(k_ar), size(v_ar))
         hm = heap_map_char_int(l)
         do i=1,l
-            call hm_push(hm,to_char(k_ar(i)), to_int64(v_ar(i)))
+            call hm_push(hm,to_int64(k_ar(i)), to_char(v_ar(i)))
         end do
     end function
 
@@ -126,30 +128,30 @@ contains
         end if
 
         if (hm%len+1 >= size(hm%key)) call add(hm)
-        hm%len = hm%len+1
-        hm%key(hm%len) = to_key(k)
-        hm%val(hm%len) = to_int64(v)
+        hm%len=hm%len+1
+        hm%key(hm%len) = to_int64(k)
+        hm%val(hm%len) = to_val(v)
         call heap_up(hm,hm%len)
     end subroutine
 
 
     subroutine hm_top(hm,k,v)
         class(heap_map_char_int):: hm
-        character(*),intent(out):: k
-        integer(int64),intent(out):: v
+        integer(int64),intent(out):: k
+        character(*),intent(out):: v
 
-        k=hm%key(1)%v
-        v=hm%val(1)
+        k=hm%key(1)
+        v=hm%val(1)%v
     end subroutine
 
 
     subroutine hm_pop(hm,k,v)
         class(heap_map_char_int):: hm
-        character(*),intent(out):: k
-        integer(int64),intent(out):: v
+        integer(int64),intent(out):: k
+        character(*),intent(out):: v
 
-        k=hm%key(1)%v
-        v=hm%val(1)
+        k=hm%key(1)
+        v=hm%val(1)%v
         hm%key(1) = hm%key(hm%len)
         hm%val(1) = hm%val(hm%len)
         hm%len=hm%len-1
@@ -164,9 +166,9 @@ contains
     end subroutine
 
 
-    subroutine add_array_k(ar)
-        type(key),allocatable,intent(inout):: ar(:)
-        type(key),allocatable:: tmp(:)
+    subroutine add_array_v(ar)
+        type(val),allocatable,intent(inout):: ar(:)
+        type(val),allocatable:: tmp(:)
         integer(int32):: l
 
         l = size(ar)
@@ -176,7 +178,7 @@ contains
     end subroutine
 
 
-    subroutine add_array_v(ar)
+    subroutine add_array_k(ar)
         integer(int64),allocatable,intent(inout):: ar(:)
         integer(int64),allocatable:: tmp(:)
         integer(int32):: l
@@ -195,7 +197,7 @@ contains
 
         do while(ind > 1)
             c = ind/2
-            if (hm%key(ind)%v <= hm%key(c)%v) return
+            if (hm%key(ind) <= hm%key(c)) return
             call kv_swap(hm,ind,c)
             ind=c 
         end do
@@ -209,8 +211,8 @@ contains
 
         do while(ind*2 <= hm%len)
             c1 = ind*2; c2 = c1+1; c=c1
-            if (c2 <= hm%len) c = merge(c1,c2,hm%key(c1)%v >= hm%key(c2)%v)
-            if (hm%key(c)%v <= hm%key(ind)%v) return
+            if (c2 <= hm%len) c = merge(c1,c2,hm%key(c1) >= hm%key(c2))
+            if (hm%key(c) <= hm%key(ind)) return
             call kv_swap(hm,c,ind)
             ind = c
         end do
@@ -220,8 +222,8 @@ contains
     subroutine hm_to_array(hm,k_ar,v_ar)
         class(heap_map_char_int):: hm
         integer(int32):: i
-        character(*):: k_ar(hm%len)
-        integer(int64):: v_ar(hm%len)
+        integer(int64):: k_ar(hm%len)
+        character(*):: v_ar(hm%len)
 
         i=1
         do while(hm_remain(hm))
@@ -233,8 +235,8 @@ contains
 
     subroutine heap_sort(k_ar,v_ar)
         type(heap_map_char_int):: hm
-        character(*):: k_ar(:)
-        integer(int64):: v_ar(:)
+        integer(int64):: k_ar(:)
+        character(*):: v_ar(:)
 
         hm = heap_map_char_int(k_ar,v_ar)
         call hm_to_array(hm,k_ar,v_ar)
@@ -248,28 +250,13 @@ contains
         call swapk(hm%key(i1),hm%key(i2))
         call swapv(hm%val(i1),hm%val(i2))
     contains
-        subroutine swapk(x,y)
-            type(key):: x,y,t
+        subroutine swapv(x,y)
+            type(val):: x,y,t
             t=x; x=y; y=t
         end subroutine
-        subroutine swapv(x,y)
+        subroutine swapk(x,y)
             integer(int64):: x,y,t
             t=x; x=y; y=t
         end subroutine
     end subroutine
 end module
-
-program main
-    use,intrinsic :: iso_fortran_env
-    use heap_map_char_int_mod
-    implicit none
-    type(heap_map_char_int):: hm
-    character(20):: k(2)
-    integer(int64):: v(2)
-
-    call hm%push(100,256)
-    call hm%push("200000000",400)
-    call hm%to_array(k,v)
-    print*, k
-    print*, v
-end program main
