@@ -1,4 +1,5 @@
 module mt19937
+    ! This module is the submodule of "random_number" module
     use,intrinsic :: iso_fortran_env
     implicit none
     private
@@ -60,6 +61,8 @@ end module mt19937
 
 
 module multiple_congruential_method
+    ! This module is the submodule of "random_number" module
+    ! These are the random numbers used by Ootoriken.
     use,intrinsic :: iso_fortran_env
     implicit none
     private
@@ -83,6 +86,27 @@ end module
 
 
 module random_number
+    ! This module include
+    ! random_mt random_mcm
+    ! random_gaussian
+
+    ! 1. random_mt
+    ! This is a function that uses the 
+    ! Mersenne Twister to return a uniform random number.
+    ! ex.) rnum = random_mt()
+
+    ! 2. random_mcm
+    ! This is a function that uses the 
+    ! multiplicative congruence method 
+    ! to return a uniform random number.
+    ! ex.) rnum = random_mcm()
+
+    ! 3. random_gaussian
+    ! This is a function that uses the 
+    ! Box-Muller method to return 
+    ! a normal random number.
+    ! ex.) rnum = random_gaussian(random_mt) <- use Mersenne Twister
+    ! ex.) rnum = random_gaussian(random_mcm) <- use multiplicative congruence method
     use,intrinsic :: iso_fortran_env
     use multiple_congruential_method
     use mt19937

@@ -87,6 +87,7 @@ contains
     end function
 end module
 
+
 module lazy_segtree_mod
     use,intrinsic :: iso_fortran_env
     use lazy_segtree_operators

@@ -25,8 +25,6 @@ module segment_tree_mod
     interface seg_tree
         module procedure:: st_init
     end interface
-
-
 contains
     function st_init(n, op, e) result(st)
         type(seg_tree):: st

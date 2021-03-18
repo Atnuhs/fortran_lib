@@ -94,12 +94,9 @@ contains
                 m(j) = m(j)*gj
                 b(i) = mod(b(i), m(i))
                 b(j) = mod(b(j), m(j))
-                ! print'(*(i0,1x))', i, j, m(i), m(j), b(i), b(j)
             end do
         end do
 
-        ! print*, "b", b(:)
-        ! print*, "m", m(:)
         m = [m,md]
         allocate(x0(size(m)), source=0_byte)
         allocate(mmul(size(m)), source=1_byte)
@@ -112,33 +109,6 @@ contains
                 mmul(j) = modulo(mmul(j)*m(i), m(j))
             end do
         end do
-        ! print*, x, mmul
         ret = modulo(x0(size(x0)), md)
     end function
 end module
-
-program main
-    use,intrinsic :: iso_fortran_env
-    use math_mod
-    implicit none
-    integer(int64):: n, i, md=10_int64**9+7, lcmv, sumx, ans
-    integer(int64),allocatable:: x(:), y(:)
-    read*, n
-    allocate(x(n), y(n))
-    read*, (x(i), y(i), i=1,n)
-    sumx=0
-    lcmv=1
-    do i=1,n
-        sumx = modulo(sumx + x(i), md)
-    end do
-    ans = chineserem(x,y,md)
-    if (sumx == 0) then
-        ! print*, 'a'
-        do i=1,n
-            lcmv = mod(lcmv*y(i), md)
-        end do
-        print'(i0)', lcmv
-    else
-        print'(i0)', ans
-    end if
-end program main
