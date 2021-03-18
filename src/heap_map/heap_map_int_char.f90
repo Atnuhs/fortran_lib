@@ -1,6 +1,4 @@
-!character(:)
-!integer(int64)
-module heap_map_char_int_mod
+module heap_map_int_char_mod
     ! This module include
     ! double_heap_sort(key_arr, value_arr) O(NlogN)
     ! heap map
@@ -10,7 +8,7 @@ module heap_map_char_int_mod
     type val
         character(:),allocatable:: v
     end type
-    type, public:: heap_map_char_int
+    type, public:: heap_map_int_char
         integer(int32),private:: len
         integer(int64), allocatable,private:: key(:)
         type(val),allocatable:: val(:)
@@ -22,7 +20,7 @@ module heap_map_char_int_mod
         procedure:: pop => hm_pop
         procedure:: to_array => hm_to_array
     end type
-    interface heap_map_char_int
+    interface heap_map_int_char
         module procedure init_hm, init_hm_with_len, init_hm_with_ar
     end interface
 contains
@@ -72,7 +70,7 @@ contains
 
 
     function init_hm() result(hm)
-        type(heap_map_char_int):: hm
+        type(heap_map_int_char):: hm
         hm%len=0
         allocate(hm%key(1))
         allocate(hm%val(1))
@@ -81,7 +79,7 @@ contains
 
     function init_hm_with_len(n) result(hm)
         integer(int32),intent(in):: n
-        type(heap_map_char_int):: hm
+        type(heap_map_int_char):: hm
         hm%len=0
         allocate(hm%key(n))
         allocate(hm%val(n))
@@ -91,10 +89,10 @@ contains
     function init_hm_with_ar(k_ar, v_ar) result(hm)
         class(*),intent(in):: k_ar(:), v_ar(:)
         integer(int32):: i, l
-        type(heap_map_char_int):: hm
+        type(heap_map_int_char):: hm
 
         l = min(size(k_ar), size(v_ar))
-        hm = heap_map_char_int(l)
+        hm = heap_map_int_char(l)
         do i=1,l
             call hm_push(hm,to_int64(k_ar(i)), to_char(v_ar(i)))
         end do
@@ -102,7 +100,7 @@ contains
 
 
     function hm_size(hm) result(ret)
-        class(heap_map_char_int):: hm
+        class(heap_map_int_char):: hm
         integer(int32):: ret
 
         ret = hm%len
@@ -110,7 +108,7 @@ contains
 
 
     function hm_remain(hm) result(ret)
-        class(heap_map_char_int):: hm
+        class(heap_map_int_char):: hm
         logical:: ret
 
         ret = hm%size() > 0
@@ -118,7 +116,7 @@ contains
 
 
     subroutine hm_push(hm,k,v)
-        class(heap_map_char_int):: hm
+        class(heap_map_int_char):: hm
         class(*):: k,v
 
         if (.not. allocated(hm%key)) then
@@ -136,7 +134,7 @@ contains
 
 
     subroutine hm_top(hm,k,v)
-        class(heap_map_char_int):: hm
+        class(heap_map_int_char):: hm
         integer(int64),intent(out):: k
         character(*),intent(out):: v
 
@@ -146,7 +144,7 @@ contains
 
 
     subroutine hm_pop(hm,k,v)
-        class(heap_map_char_int):: hm
+        class(heap_map_int_char):: hm
         integer(int64),intent(out):: k
         character(*),intent(out):: v
 
@@ -160,7 +158,7 @@ contains
 
 
     subroutine add(hm)
-        class(heap_map_char_int):: hm
+        class(heap_map_int_char):: hm
         call add_array_k(hm%key)
         call add_array_v(hm%val)
     end subroutine
@@ -191,7 +189,7 @@ contains
 
 
     subroutine heap_up(hm,ind)
-        class(heap_map_char_int):: hm
+        class(heap_map_int_char):: hm
         integer(int32),value:: ind
         integer(int32):: c
 
@@ -205,7 +203,7 @@ contains
 
 
     subroutine heap_down(hm,ind)
-        class(heap_map_char_int):: hm
+        class(heap_map_int_char):: hm
         integer(int32),value:: ind
         integer(int32):: c1,c2,c
 
@@ -220,7 +218,7 @@ contains
 
 
     subroutine hm_to_array(hm,k_ar,v_ar)
-        class(heap_map_char_int):: hm
+        class(heap_map_int_char):: hm
         integer(int32):: i
         integer(int64):: k_ar(hm%len)
         character(*):: v_ar(hm%len)
@@ -234,17 +232,17 @@ contains
 
 
     subroutine heap_sort(k_ar,v_ar)
-        type(heap_map_char_int):: hm
+        type(heap_map_int_char):: hm
         integer(int64):: k_ar(:)
         character(*):: v_ar(:)
 
-        hm = heap_map_char_int(k_ar,v_ar)
+        hm = heap_map_int_char(k_ar,v_ar)
         call hm_to_array(hm,k_ar,v_ar)
     end subroutine
 
 
     subroutine kv_swap(hm,i1,i2)
-        type(heap_map_char_int):: hm
+        type(heap_map_int_char):: hm
         integer(int32):: i1,i2
         
         call swapk(hm%key(i1),hm%key(i2))
@@ -255,8 +253,10 @@ contains
             t=x; x=y; y=t
         end subroutine
         subroutine swapk(x,y)
-            integer(int64):: x,y,t
-            t=x; x=y; y=t
+            integer(int64):: x,y
+            x=xor(x,y)
+            y=xor(x,y)
+            x=xor(x,y)
         end subroutine
     end subroutine
 end module

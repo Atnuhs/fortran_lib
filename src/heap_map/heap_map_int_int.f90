@@ -36,6 +36,7 @@ contains
         end select
     end function
 
+
     function init_hm() result(hm)
         type(heap_map_int_int):: hm
         hm%len=0
@@ -65,6 +66,7 @@ contains
         end do
     end function
 
+    
     function hm_size(hm) result(ret)
         class(heap_map_int_int):: hm
         integer(int32):: ret
