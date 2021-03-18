@@ -6,7 +6,7 @@ module heap_map_int_int_mod
     use,intrinsic :: iso_fortran_env
     private
     public:: double_heap_sort
-    type, public:: heap_map
+    type, public:: heap_map_int_int
         integer(int32),private:: len
         integer(int64), allocatable,private:: key(:), val(:)
     contains
@@ -17,7 +17,7 @@ module heap_map_int_int_mod
         procedure:: pop => hm_pop
         procedure:: to_array => hm_to_array
     end type
-    interface heap_map
+    interface heap_map_int_int
         module procedure init_hm, init_hm_with_len, init_hm_with_ar
     end interface
 contains
@@ -37,7 +37,7 @@ contains
     end function
 
     function init_hm() result(hm)
-        type(heap_map):: hm
+        type(heap_map_int_int):: hm
         hm%len=0
         allocate(hm%key(1))
         allocate(hm%val(1))
@@ -46,7 +46,7 @@ contains
 
     function init_hm_with_len(n) result(hm)
         integer(int32),intent(in):: n
-        type(heap_map):: hm
+        type(heap_map_int_int):: hm
         hm%len=0
         allocate(hm%key(n))
         allocate(hm%val(n))
@@ -56,17 +56,17 @@ contains
     function init_hm_with_ar(k_ar, v_ar) result(hm)
         class(*),intent(in):: k_ar(:), v_ar(:)
         integer(int32):: i, l
-        type(heap_map):: hm
+        type(heap_map_int_int):: hm
 
         l = min(size(k_ar), size(v_ar))
-        hm = heap_map(l)
+        hm = heap_map_int_int(l)
         do i=1,l
             call hm%push(to_int64(k_ar(i)), to_int64(v_ar(i)))
         end do
     end function
 
     function hm_size(hm) result(ret)
-        class(heap_map):: hm
+        class(heap_map_int_int):: hm
         integer(int32):: ret
 
         ret = hm%len
@@ -74,7 +74,7 @@ contains
 
 
     function hm_remain(hm) result(ret)
-        class(heap_map):: hm
+        class(heap_map_int_int):: hm
         logical:: ret
 
         ret = hm%size() > 0
@@ -82,7 +82,7 @@ contains
 
 
     subroutine hm_push(hm,k,v)
-        class(heap_map):: hm
+        class(heap_map_int_int):: hm
         class(*):: k,v
 
         if (.not. allocated(hm%key)) then
@@ -100,7 +100,7 @@ contains
 
 
     subroutine hm_top(hm,k,v)
-        class(heap_map):: hm
+        class(heap_map_int_int):: hm
         integer(int64),intent(out):: k, v
 
         k=hm%key(1)
@@ -109,7 +109,7 @@ contains
 
 
     subroutine hm_pop(hm,k,v)
-        class(heap_map):: hm
+        class(heap_map_int_int):: hm
         integer(int64),intent(out):: k, v
 
         k=hm%key(1)
@@ -122,7 +122,7 @@ contains
 
 
     subroutine add(hm)
-        class(heap_map):: hm
+        class(heap_map_int_int):: hm
 
         call add_array(hm%key)
         call add_array(hm%val)
@@ -142,7 +142,7 @@ contains
 
 
     subroutine heap_up(hm,ind)
-        class(heap_map):: hm
+        class(heap_map_int_int):: hm
         integer(int32),value:: ind
         integer(int32):: c
 
@@ -156,7 +156,7 @@ contains
 
 
     subroutine heap_down(hm,ind)
-        class(heap_map):: hm
+        class(heap_map_int_int):: hm
         integer(int32),value:: ind
         integer(int32):: c1,c2,c
 
@@ -171,7 +171,7 @@ contains
 
 
     subroutine hm_to_array(hm, k_ar, v_ar)
-        class(heap_map):: hm
+        class(heap_map_int_int):: hm
         integer(int64):: k_ar(hm%len), v_ar(hm%len)
 
         k_ar(:) = hm%key(:)
@@ -180,16 +180,16 @@ contains
 
 
     subroutine double_heap_sort(k_ar, v_ar)
-        type(heap_map):: hm
+        type(heap_map_int_int):: hm
         integer(int64):: k_ar(:), v_ar(:)
 
-        hm = heap_map(k_ar, v_ar)
+        hm = heap_map_int_int(k_ar, v_ar)
         call hm_to_array(hm,k_ar,v_ar)
     end subroutine
 
 
     subroutine kv_swap(hm, i1, i2)
-        type(heap_map),intent(inout):: hm
+        type(heap_map_int_int),intent(inout):: hm
         integer(int32),intent(in):: i1,i2
         
         call swapk(hm%key(i1),hm%key(i2))
