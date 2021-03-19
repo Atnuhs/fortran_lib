@@ -48,7 +48,7 @@ contains
         ! solve:: mod(ax, m) = 1
         !      => ax + my = 1
         ! input:: a,m
-        ! output:: x <- モジュラ逆数
+        ! output:: x <- 逆元
         integer(byte),intent(in):: a,m
         integer(byte):: ret, gcd_ma, x, y
 
@@ -101,7 +101,6 @@ contains
         allocate(x0(size(m)), source=0_byte)
         allocate(mmul(size(m)), source=1_byte)
 
-        
         do i=1_byte,size(b)
             t = modulo((b(i)-x0(i)) * mod_inv(mmul(i), m(i)), m(i))
             do j=i+1,size(m)

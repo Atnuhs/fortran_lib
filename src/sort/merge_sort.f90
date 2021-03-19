@@ -1,4 +1,5 @@
 module merge_sort_mod
+    ! call merge_sort(arr) <- int32, int64, character
     use,intrinsic :: iso_fortran_env
     implicit none
     private

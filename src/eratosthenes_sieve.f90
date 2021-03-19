@@ -1,16 +1,17 @@
 module eratosthenes_sieve_mod
     use,intrinsic :: iso_fortran_env
-    use vector_int64_mod
+    use vector_mod
     implicit none
+    integer(int32),private,parameter:: prec=int32
     public
-    type(vector_int64):: sieve_vec, primes
+    type(vector):: sieve_vec, primes
 
 contains
     subroutine sieve(n)
-        integer(int64),intent(in):: n
-        integer(int64):: i,j
+        integer(prec),intent(in):: n
+        integer(prec):: i,j
         
-        sieve_vec = vector_int64(n)
+        sieve_vec = vector(n)
         do i=2,n
             if (sieve_vec%at(i)/=0) cycle
             call primes%push_back(i)
@@ -25,10 +26,10 @@ contains
 
 
     function factor_vec(x) result(ret)
-        integer(int64),value:: x
-        type(vector_int64):: ret
+        integer(prec),value:: x
+        type(vector):: ret
 
-        call ret%push_back(1_int64)
+        call ret%push_back(1_prec)
         do while(x/=1)
             call ret%push_back(sieve_vec%at(x))
             x=x / sieve_vec%at(x)
@@ -37,21 +38,21 @@ contains
 
 
     function factor(x) result(ret)
-        integer(int64),intent(in):: x
-        integer(int64):: i,n
-        type(vector_int64):: fv
-        integer(int64), allocatable:: tmp(:,:), ret(:,:)
+        integer(prec),intent(in):: x
+        integer(prec):: i,n
+        type(vector):: fv
+        integer(prec), allocatable:: tmp(:,:), ret(:,:)
 
         fv = factor_vec(x)
         n=1
-        allocate(tmp(2,fv%size()),source=0_int64)
-        tmp(:,1) = [fv%at(1_int64),1_int64]
+        allocate(tmp(2,fv%size()),source=0_prec)
+        tmp(:,1) = [fv%at(1_prec),1_prec]
         do i=2,fv%size()
             if (fv%at(i) == fv%at(i-1)) then
                 tmp(2,n) = tmp(2,n)+1
             else
                 n=n+1
-                tmp(:,n) = [fv%at(i), 1_int64]
+                tmp(:,n) = [fv%at(i), 1_prec]
             end if
         end do
         ret = tmp(:,1:n)
@@ -59,7 +60,7 @@ contains
 
 
     function is_prime(x) result(ret)
-        integer(int64),intent(in):: x
+        integer(prec),intent(in):: x
         logical:: ret
 
         ret = sieve_vec%at(x) == x

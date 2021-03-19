@@ -4,10 +4,10 @@ module union_find_mod
     type,public:: union_find
         integer(int64),allocatable,private:: parent(:)
     contains
-        procedure:: root => uf_root
-        procedure:: is_family => uf_is_family
-        procedure:: unite => uf_unite
-        procedure:: size => uf_size
+        procedure:: root => uf_root ! その要素の族を返す
+        procedure:: is_family => uf_is_family ! 二つの要素が同族か判定
+        procedure:: unite => uf_unite ! 二つの要素の族を融合
+        procedure:: size => uf_size ! その要素の族の数を返す
     end type
 
     interface union_find

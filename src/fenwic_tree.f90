@@ -1,9 +1,10 @@
-! use with vector_int32
 module fenwic_tree_mod
-    use vector_int32_mod
+    use vector_mod
     use,intrinsic :: iso_fortran_env
+    implicit none
+    integer(int32),private,parameter:: prec = int32
     type,public:: fenwic
-        type(vector_int32):: vec
+        type(vector):: vec
     contains
         procedure:: push => fw_push
         procedure:: prefix_sum => fw_prefix_sum
@@ -12,7 +13,7 @@ module fenwic_tree_mod
     end type
 contains
     function lsb(x) result(ret)
-        integer(int32):: x,ret
+        integer(prec):: x,ret
 
         ret = iand(x,-x)
     end function
@@ -20,15 +21,15 @@ contains
 
     function fw_size(fw) result(ret)
         type(fenwic),intent(in):: fw
-        integer(int32):: ret
+        integer(prec):: ret
         
         ret = vec_size(fw%vec)
     end function
 
     subroutine fw_push(fw,x)
         class(fenwic),intent(inout):: fw
-        integer(int32),intent(in):: x
-        integer(int32):: i,bx,k,n
+        integer(prec),intent(in):: x
+        integer(prec):: i,bx,k,n
 
         i=1; bx=x; n=fw_size(fw)+1; k=lsb(n)
         do while(i /= k)
@@ -41,8 +42,8 @@ contains
 
     function fw_prefix_sum(fw,i) result(ret)
         class(fenwic):: fw
-        integer(int32),intent(in):: i
-        integer(int32):: bi,ret
+        integer(prec),intent(in):: i
+        integer(prec):: bi,ret
 
         ret=0; bi=i
         do while(bi>0)
@@ -54,8 +55,8 @@ contains
 
     function fw_sum(fw,l,r) result(ret)
         class(fenwic):: fw
-        integer(int32),intent(in):: l,r
-        integer(int32):: ret
+        integer(prec),intent(in):: l,r
+        integer(prec):: ret
 
         ret = fw%prefix_sum(r) - fw%prefix_sum(l-1)
     end function
@@ -63,8 +64,8 @@ contains
 
     subroutine fw_add(fw,i,x)
         class(fenwic):: fw
-        integer(int32),intent(in):: i,x
-        integer(int32):: bi
+        integer(prec),intent(in):: i,x
+        integer(prec):: bi
 
         bi = i
         do while (bi <= fw_size(fw))
@@ -76,8 +77,8 @@ contains
 
     subroutine fw_from_array(fw,ar)
         type(fenwic):: fw
-        integer(int32):: ar(:)
-        integer(int32):: n,i
+        integer(prec):: ar(:)
+        integer(prec):: n,i
 
         n=size(ar)
         do i=1,n

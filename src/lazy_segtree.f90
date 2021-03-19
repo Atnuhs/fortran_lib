@@ -1,6 +1,5 @@
 module lazy_segtree_operators
     use,intrinsic :: iso_fortran_env
-    use number_theory_mod
     implicit none
     integer(int64),parameter:: md = 998244353
     type s_elem

@@ -1,5 +1,6 @@
 ! ar1のソート順序でar2もソートする。
 module double_merge_sort_mod
+    ! call double_merge_sort(ar1, ar2) <- int32, int64
     use,intrinsic :: iso_fortran_env
     implicit none
     private

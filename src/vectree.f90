@@ -1,3 +1,19 @@
+! procedure,public:: insert(i,v)   -> subroutine
+! procedure,public:: erase(i)      -> subroutine
+! procedure,public:: push_back(v)  -> subroutine
+! procedure,public:: push_front(v) -> subroutine
+! procedure,public:: pop(i)        -> vec[i] & remove vec[i]
+! procedure,public:: pop_back()    -> vec[last] & remove vec[i]
+! procedure,public:: pop_front()   -> vec[top] & remove vec[i]
+! procedure,public:: at(i)         -> vec[i] 
+! procedure,public:: size          -> size(vec)
+! procedure,public:: to_array      -> arr(sorted)
+! procedure,public:: update(i,v)   -> subroutine
+! public:: vt_print
+! public:: vt_print_debug
+
+
+
 module vec_tree_node_mod
     use,intrinsic :: iso_fortran_env
     implicit none
@@ -350,8 +366,6 @@ module vec_tree_mod
     implicit none
     private
     public:: vt_print, vt_print_debug
-    public:: vt_size
-    public:: vt_to_array
     type,public:: vectree
         type(vec_tree_node),pointer,private:: head => null()
         integer(int32),private:: len = 0

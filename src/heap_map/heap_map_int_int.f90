@@ -66,7 +66,7 @@ contains
         end do
     end function
 
-    
+
     function hm_size(hm) result(ret)
         class(heap_map_int_int):: hm
         integer(int32):: ret
@@ -176,8 +176,10 @@ contains
         class(heap_map_int_int):: hm
         integer(int64):: k_ar(hm%len), v_ar(hm%len)
 
-        k_ar(:) = hm%key(:)
-        v_ar(:) = hm%val(:)
+        do while(hm_remain(hm))
+            call hm_pop(hm,k_ar(i), v_ar(i))
+            i=i+1
+        end do
     end subroutine
 
 
