@@ -1,4 +1,8 @@
 module heap_mod
+    ! 最小値を素早く返します。
+    ! 最大値を素早く返したい場合
+    !  1. 値の符号を変えてpush
+    !  2. popやtopで取得した値は符号を元に戻すのを忘れずに。
     use,intrinsic :: iso_fortran_env
     private
     integer(int32),private,parameter:: prec=int32
@@ -108,13 +112,13 @@ contains
     subroutine heap_up(h,ind)
         class(heap),intent(inout):: h
         integer(prec),value:: ind
-        integer(prec):: c
+        integer(prec):: p
 
         do while(ind > 1)
-            c = ind/2
-            if (h%val(ind) <= h%val(c)) return
-            call k_swap(h,ind,c)
-            ind=c 
+            p = ind/2
+            if (h%val(ind) <= h%val(p)) return
+            call k_swap(h,ind,p)
+            ind=p
         end do
     end subroutine
 

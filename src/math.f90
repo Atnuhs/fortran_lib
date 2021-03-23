@@ -4,19 +4,19 @@ module math_mod
     ! extgcd
     use,intrinsic :: iso_fortran_env
     implicit none
-    integer(int32),parameter:: byte = int64
+    integer(int32),parameter:: prec = int64
 contains
     function lcm(a, b) result(ret)
-        integer(byte),intent(in):: a,b
-        integer(byte):: ret
+        integer(prec),intent(in):: a,b
+        integer(prec):: ret
 
         ret = a*b/gcd(a,b)
     end function
 
 
     recursive function gcd(a, b) result(ret)
-        integer(byte),intent(in):: a,b
-        integer(byte):: ret
+        integer(prec),intent(in):: a,b
+        integer(prec):: ret
 
         if (b == 0_byte) then
             ret = a
@@ -30,9 +30,9 @@ contains
         ! solve:: ax + by = gcd(a,b) 
         ! input:: a, b
         ! output::  x, y, gcd(a,b)
-        integer(byte),value:: a,b
-        integer(byte),intent(out):: x,y
-        integer(byte):: ret ! gcd(a,b)
+        integer(prec),value:: a,b
+        integer(prec),intent(out):: x,y
+        integer(prec):: ret ! gcd(a,b)
 
         if (b==0_byte) then
             ret = a
@@ -49,8 +49,8 @@ contains
         !      => ax + my = 1
         ! input:: a,m
         ! output:: x <- 逆元
-        integer(byte),intent(in):: a,m
-        integer(byte):: ret, gcd_ma, x, y
+        integer(prec),intent(in):: a,m
+        integer(prec):: ret, gcd_ma, x, y
 
         gcd_ma = extgcd(a,m,x,y)
         
@@ -68,11 +68,11 @@ contains
         !         mod(b_n*k_n, m_n) = x を満たす最小のx
         ! input:: b(1:n), m(1:n)
         ! output:: x%md
-        integer(byte),allocatable:: b(:),m(:)
-        integer(byte):: md
-        integer(byte),allocatable:: x0(:), mmul(:)
-        integer(byte):: ret, i, j, g, gi, gj
-        integer(byte):: t
+        integer(prec),allocatable:: b(:),m(:)
+        integer(prec):: md
+        integer(prec),allocatable:: x0(:), mmul(:)
+        integer(prec):: ret, i, j, g, gi, gj
+        integer(prec):: t
 
         do i=1_byte,size(b)
             do j=1_byte, i-1_byte

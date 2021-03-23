@@ -88,7 +88,7 @@ contains
         class(vector),intent(inout):: vec
         integer(prec):: ret
         
-        ret = vec%at(1)
+        ret = vec%at(1_prec)
     end function
 
 
@@ -121,9 +121,9 @@ contains
         call check_array_allocation(vec)
         len_alloc = size(vec%array)
         if (vec%l >= len_alloc) then
-            call vec_append_array(vec,1,len_alloc)
+            call vec_append_array(vec,1_prec,len_alloc)
         else if (vec%l <= len_alloc/2) then
-            call vec_reduce_array(vec,1,len_alloc)
+            call vec_reduce_array(vec,1_prec,len_alloc)
         end if
     end subroutine
 
