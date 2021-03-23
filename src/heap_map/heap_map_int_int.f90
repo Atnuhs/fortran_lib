@@ -2,7 +2,10 @@ module heap_map_int_int_mod
     ! This module include
     ! double_heap_sort(key_arr, value_arr) O(NlogN)
     ! heap map
-    
+    ! 最小値を素早く返します。
+    ! 最大値を素早く返したい場合
+    !  1. 値の符号を変えてpush
+    !  2. popやtopで取得した値は符号を元に戻すのを忘れずに。
     use,intrinsic :: iso_fortran_env
     private
     public:: double_heap_sort

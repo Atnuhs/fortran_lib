@@ -2,6 +2,9 @@ module heap_map_char_int_mod
     ! This module include
     ! double_heap_sort(key_arr, value_arr) O(NlogN)
     ! heap map
+    ! 辞書順先頭を素早く返します。
+    ! 辞書順最後尾を素早く返したい場合
+    !  1. heap_up, heap_downの不等号の向きを逆にする。
     use,intrinsic :: iso_fortran_env
     private
     public:: to_char
