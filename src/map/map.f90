@@ -1,8 +1,18 @@
+! key : int(32,64) or char(*) 返り値はchar
+! value : int(32,64) 返り値はint64
+! mod名: map_mod
+! class名: map
+! use ex)
+!    call m%push(1, 3)
+!    call m%push('abc', 24)
+!    call m%push(2992_int64, 1000100010001000_int64)
+! map_print map_print_debug
+
 module map_node_mod
     use,intrinsic :: iso_fortran_env
     implicit none
     private
-    public:: mn_insert64
+    public:: mn_push64
     public:: mn_erase
     public:: mn_to_array
     public:: mn_print, mn_print_debug
@@ -204,7 +214,7 @@ contains
     end function
 
 
-    recursive function mn_insert64(n,key,val,inserted) result(ret)
+    recursive function mn_push64(n,key,val,inserted) result(ret)
         type(map_node),pointer:: n,ret
         character(*),intent(in):: key
         integer(int64),intent(in):: val
@@ -217,9 +227,9 @@ contains
             inserted = .true.
             return
         else if (key > n%key) then
-            n%right_child => mn_insert64(n%right_child, key, val, inserted)
+            n%right_child => mn_push64(n%right_child, key, val, inserted)
         else if (key < n%key) then
-            n%left_child => mn_insert64(n%left_child, key, val, inserted)
+            n%left_child => mn_push64(n%left_child, key, val, inserted)
         end if
         n => mn_skew(n)
         n => mn_split(n)
@@ -333,7 +343,7 @@ module map_mod
         type(map_node),pointer,private:: head => null()
         integer(int32),private:: len = 0
     contains
-        procedure,public:: insert => map_insert
+        procedure,public:: push => map_push
         procedure,public:: erase => map_erase
         procedure,public:: has_key => map_has_key
         procedure,public:: at => map_at
@@ -367,10 +377,10 @@ contains
         select type (key)
             type is (integer(int64))
                 write(ctmp,*) key
-                ckey = trim(ctmp)
+                ckey = trim(adjustl(ctmp))
             type is (integer(int32))
                 write(ctmp,*) key
-                ckey = trim(ctmp)
+                ckey = trim(adjustl(ctmp))
             type is (character(*))
                 ckey = key
             class default
@@ -403,7 +413,7 @@ contains
     end function
 
 
-    subroutine map_insert(m,key,val)
+    subroutine map_push(m,key,val)
         class(map),intent(inout):: m
         class(*),intent(in):: key,val
         character(:),allocatable:: ckey
@@ -417,7 +427,7 @@ contains
             new = map_node(key=ckey, val=val64)
             m%head => new
         else
-            m%head => mn_insert64(m%head, ckey, val64, inserted)
+            m%head => mn_push64(m%head, ckey, val64, inserted)
         end if
         if(inserted) m%len=m%len+1
     end subroutine
