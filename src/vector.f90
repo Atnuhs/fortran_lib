@@ -14,6 +14,8 @@ module vector_mod
         procedure:: pop_back=>vec_pop_back, pop=>vec_pop, erase => vec_erase
         procedure:: at=>vec_at, back=>vec_back, head=>vec_head
         procedure:: to_array => vec_to_array, size => vec_size
+        procedure:: max => vec_max, min => vec_min
+        procedure:: extrema => vec_extrema
         procedure:: update => vec_update
     end type
     interface vector
@@ -49,6 +51,34 @@ contains
         ret = vec%l
     end function
 
+    pure function vec_max(vec) result(ret)
+        class(vector),intent(in):: vec
+        integer(prec):: ret
+
+        ret = maxval(vec%array)
+    end function
+
+
+    pure function vec_min(vec) result(ret)
+        class(vector),intent(in):: vec
+        integer(prec):: ret
+
+        ret = minval(vec%array)
+    end function
+
+    
+    pure subroutine vec_extrema(vec, mi, ma) 
+        class(vector),intent(in):: vec
+        integer(prec),intent(out):: mi, ma
+        integer(int32):: i
+
+        mi = vec%array(1)
+        ma = vec%array(1)
+        do i=1,size(vec%array)
+            mi = min(mi, vec%array(i))
+            ma = max(ma, vec%array(i))
+        end do
+    end subroutine
 
     pure subroutine check_array_allocation(vec)
         type(vector),intent(inout):: vec
