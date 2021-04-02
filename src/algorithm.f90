@@ -195,3 +195,10 @@ contains
         ret = mod(mod(frac(n)*ifrac(p),md)*ifrac(n-p),md)
     end function
 end module
+
+
+module algorithm_mod 
+    use math_mod
+    use combination_mod
+    implicit none
+end module
