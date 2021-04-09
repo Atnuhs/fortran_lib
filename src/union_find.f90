@@ -66,3 +66,4 @@ contains
 
         uf_size = -uf%parent(uf%root(x))
     end function
+end module
