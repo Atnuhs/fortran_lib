@@ -1,121 +1,79 @@
-module merge_sort_mod
+module merge_sort_int32
     ! call merge_sort(arr) <- int32, int64, character
     use,intrinsic :: iso_fortran_env
     implicit none
     private
     public:: merge_sort
-
-    interface merge_sort
-        module procedure ms32, ms64, msc
-    end interface
 contains
-    recursive subroutine ms32(ar)
+    recursive subroutine merge_sort(ar)
         integer(int32),intent(inout):: ar(:)
-        integer(int32):: m
+        integer(int32):: i,n,d,hd,tmp(size(ar))
 
-        if (size(ar) <= 1) then
-            return
-        else
-            m = size(ar)/2
-            call ms32(ar(:m)); call ms32(ar(m+1:))
-            call sub_ms32(ar)
-        end if
+        n = size(ar)
+        do i=1,n-1,2
+            if (ar(i+1) < ar(i)) call swap(ar(i), ar(i+1))
+        end do
+        hd=2
+        d=4
+        do while(hd <= n)
+            do i=1,n-d,d
+                call merge_sub(ar(i:i+d-1), tmp, hd, hd+1, d)
+            end do
+            i = (n/d)*d+1
+            if (i+hd <= n) then
+                call merge_sub(ar(i:), tmp, hd, hd+1, n-i+1) 
+            end if
+            hd=d
+            d=d*2
+        end do
     end subroutine
 
 
-    subroutine sub_ms32(ar)
-        integer(int32),intent(inout):: ar(:)
-        integer(int32):: tmp(1:size(ar))
-        integer(int32):: m,l,r,i
+    subroutine merge_sub(ar, tmp, n1, i2, n2)
+        integer(int32),intent(inout):: ar(:), tmp(:)
+        integer(int32),value:: n1, i2, n2
+        integer(int32):: i,i1
         
-        tmp(:) = ar(:)
-        m = size(ar)/2; l=1;r=m+1
-        do i=1,size(ar)
-            if (m < l) then
-                ar(i:)=tmp(r:); return 
-            else if (size(ar) < r) then
-                ar(i:)=tmp(l:m); return
+        i1=1
+        tmp(i1:n1) = ar(i1:n1)
+        do i=1,n2
+            if (n1 < i1) then
+                return
+            else if (n2 < i2) then
+                ar(i:)=tmp(i1:n1)
+                return
             else
-                if (tmp(l) <= tmp(r)) then
-                    ar(i) = tmp(l); l=l+1
+                if (ar(i2) <= tmp(i1)) then
+                    ar(i) = ar(i2); i2=i2+1
                 else
-                    ar(i) = tmp(r); r=r+1
+                    ar(i) = tmp(i1); i1=i1+1
                 end if
             end if
         end do
     end subroutine
 
+    subroutine swap(x, y)
+        integer(int32),intent(inout):: x, y
+        integer(int32):: t1, t2
 
-    recursive subroutine ms64(ar)
-        integer(int64),intent(inout):: ar(:)
-        integer(int32):: m
-
-        if (size(ar) <= 1) then
-            return
-        else
-            m = size(ar)/2
-            call ms64(ar(:m)); call ms64(ar(m+1:))
-            call sub_ms64(ar)
-        end if
-    end subroutine
-
-
-    subroutine sub_ms64(ar)
-        integer(int64),intent(inout):: ar(:)
-        integer(int64):: tmp(1:size(ar))
-        integer(int32):: m,l,r,i
-        
-        tmp(:) = ar(:)
-        m = size(ar)/2; l=1;r=m+1
-        do i=1,size(ar)
-            if (m < l) then
-                ar(i:)=tmp(r:); return
-            else if (size(ar) < r) then
-                ar(i:)=tmp(l:m); return
-            else
-                if (tmp(l) <= tmp(r)) then
-                    ar(i) = tmp(l); l=l+1
-                else
-                    ar(i) = tmp(r); r=r+1
-                end if
-            end if
-        end do
-    end subroutine
-
-
-    recursive subroutine msc(ar)
-        character(*),intent(inout):: ar(:)
-        integer(int32):: m
-
-        if (size(ar) <= 1) then
-            return
-        else
-            m = size(ar)/2
-            call msc(ar(:m)); call msc(ar(m+1:))
-            call sub_msc(ar)
-        end if
-    end subroutine
-
-
-    subroutine sub_msc(ar)
-        character(*),intent(inout):: ar(:)
-        character(:),allocatable:: tmp(:)
-        integer(int32):: m,l,r,i
-        
-        allocate(tmp, source=ar)
-        m = size(ar)/2; l=1;r=m+1
-        do i=1,size(ar)
-            if (m < l) then
-                ar(i:)=tmp(r:); return 
-            else if (size(ar) < r) then
-                ar(i:)=tmp(l:m); return
-            else
-                if (tmp(l) <= tmp(r)) then
-                    ar(i) = tmp(l); l=l+1
-                else
-                    ar(i) = tmp(r); r=r+1
-                end if
-            end if
-        end do
+            t1 = x
+            t2 = y
+            x = t2
+            y = t1
     end subroutine
 end module
+
+program main
+    use,intrinsic :: iso_fortran_env
+    use merge_sort_int32
+    implicit none
+
+    integer(int32):: n
+    integer(int32), allocatable:: a(:)
+
+    read*, n
+    allocate(a(n))
+    read*, a(:)
+    call merge_sort(a)
+    print'(*(i0,1x))', a(:)
+end program main
