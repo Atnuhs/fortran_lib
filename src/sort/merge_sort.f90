@@ -15,14 +15,20 @@ contains
         end do
         hd=2
         d=4
-        do while(hd <= n)
+        do while(hd < n)
+            ! print'(a)', repeat('=',40)
             do i=1,n-d,d
+                ! print'("span ",*(i0,1x))', i, i+d-1
                 call merge_sub(ar(i:i+d-1), tmp, hd, hd+1, d)
+                ! print'("    : ", *(i0,1x))', ar(i:i+d-1)
             end do
-            i = (n/d)*d+1
+            i = ((n+d-1)/d-1)*d+1
             if (i+hd <= n) then
+                ! print'("span ",*(i0,1x))', i, n
                 call merge_sub(ar(i:), tmp, hd, hd+1, n-i+1) 
+                ! print'("    : ", *(i0,1x))', ar(i:n)
             end if
+            ! print'("all: ",*(i0,1x))', ar
             hd=d
             d=d*2
         end do
@@ -68,12 +74,22 @@ program main
     use merge_sort_int32
     implicit none
 
-    integer(int32):: n
+    integer(int32):: n, i
     integer(int32), allocatable:: a(:)
 
     read*, n
-    allocate(a(n))
-    read*, a(:)
+    allocate(a(n), source=[(random(-100,100),i=1,n)])
     call merge_sort(a)
     print'(*(i0,1x))', a(:)
+    print*, (a(i)-a(i-1)>=0, i=2,n)
+
+contains
+function random(l,r) result(v)
+    integer(int32),intent(in):: l,r
+    integer(int32):: v
+    real(real64):: rn
+
+    call random_number(rn)
+    v = int(rn*(r-l+1)) + l
+end function
 end program main
