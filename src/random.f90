@@ -1,3 +1,9 @@
+! use random_mod
+
+! rnd()          => real64,         0 <= v < 1
+! randint(n)     => int32 or int64, 0 <= v <= n
+! randrange(l,r) => int32 or int64, l <= v <= r
+
 module random01_mod
     use,intrinsic :: iso_fortran_env
     implicit none
