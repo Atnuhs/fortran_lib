@@ -212,14 +212,15 @@ contains
 
     subroutine vec_reverse(vec)
         class(vector):: vec
-        integer(prec):: i, j, n
+        integer(prec):: i, j, n, t1, t2
 
         n = vec%size()
         do i=1,n/2
             j = n+1-j
-            vec%array(i) = xor(vec%array(i), vec%array(j))
-            vec%array(j) = xor(vec%array(i), vec%array(j))
-            vec%array(i) = xor(vec%array(i), vec%array(j))
+            t1 = vec%array(i)
+            t2 = vec%array(j)
+            vec%array(j) = t1
+            vec%array(i) = t2
         end do
     end subroutine
 
