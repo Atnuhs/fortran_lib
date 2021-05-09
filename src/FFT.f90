@@ -23,11 +23,11 @@ contains
         fftc%l = array_len
         fftc%hl = fftc%l/2
         fftc%bit_len = 0
-        do while(lshift(1,fftc%bit_len) < fftc%l)
+        do while(shiftl(1,fftc%bit_len) < fftc%l)
             fftc%bit_len = fftc%bit_len + 1
         end do
 
-        fftc%n = lshift(1,fftc%bit_len)
+        fftc%n = shiftl(1,fftc%bit_len)
         ! print*, fftc%l, fftc%hl, fftc%n, fftc%bit_len
         call fftc%set_w()
     end function
@@ -39,7 +39,7 @@ contains
 
         if (allocated(fftc%wr)) deallocate(fftc%wr)
         if (allocated(fftc%wi)) deallocate(fftc%wi)
-        hn = rshift(fftc%n,1)
+        hn = shiftr(fftc%n,1)
         allocate(fftc%wr(0:hn-1), fftc%wi(0:hn-1))
         
         theta = -pi2/real(fftc%n, kind=real64)
@@ -83,8 +83,8 @@ contains
         revx=0
             do i=0,bit_len-1
                 ! print*, k,h-k-1,h,n
-                t = iand(1, rshift(x,i))
-                revx = ieor(revx, lshift(t, bit_len-1-i))
+                t = iand(1, shiftr(x,i))
+                revx = ieor(revx, shiftl(t, bit_len-1-i))
             end do
     end function
 
@@ -117,12 +117,12 @@ contains
         logical:: inv
 
         hm = 1
-        m = lshift(hm,1)
+        m = shiftl(hm,1)
         t=0
         do while(m <= fftc%n)
             t=t+1
             do i=0, fftc%n-1, m
-                hi = rshift(i,t)
+                hi = shiftr(i,t)
 
                 wkr = fftc%wr(hi)
                 wki = fftc%wi(hi)
@@ -138,7 +138,7 @@ contains
                 end do
             end do
             hm = m
-            m = lshift(hm,1)
+            m = shiftl(hm,1)
         end do
     end subroutine
 end module

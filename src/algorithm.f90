@@ -59,7 +59,7 @@ contains
         do while(exponent > 0)
             if (btest(exponent, 0)) ret=mod(ret*base,m)
             base=mod(base*base,m)
-            exponent=rshift(exponent,1)
+            exponent=shiftr(exponent,1)
         end do
     end function
 
