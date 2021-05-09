@@ -39,11 +39,28 @@ contains
     function read_grid(w,h) result(s)
         ! how to use => "s = read_grid(w,h)"
         integer(int32),intent(in):: w,h
-        character(1):: s(w,h)
+        character(1),allocatable:: s(:,:)
         character(w):: lines(h)
         integer(int32):: i
+        
+        allocate(s(w,h))
+        read*, (lines(i), i=1,h)
+        s = reshape([(transfer(lines(i),s(:,i)), i=1,h)], [w,h])
+    end function
 
-            read*, (lines(i), i=1,h)
-            s = reshape([(transfer(lines(i),s(:,i)), i=1,h)], [w,h])
+    function list_to_char(lc) result(s)
+        character(1):: lc(:)
+        character(:),allocatable:: s
+
+        allocate(character(size(lc)):: s)
+        s = transfer(lc,s)
+    end function
+
+    function char_to_list(s) result(lc)
+        character(*):: s
+        character(1),allocatable:: lc(:)
+
+        allocate(lc(len_trim(s)))
+        lc = transfer(trim(s),lc)
     end function
 end module
