@@ -1,6 +1,5 @@
 ! fenwic treeでバグらない要注意
 module vector_mod
-    use merge_sort_mod
     use,intrinsic :: iso_fortran_env
     implicit none
     integer(int32),private,parameter:: prec = int32
@@ -16,7 +15,6 @@ module vector_mod
         procedure:: to_array => vec_to_array, size => vec_size
         procedure:: max => vec_max, min => vec_min
         procedure:: extrema => vec_extrema
-        procedure:: sort => vec_sort
         procedure:: reverse => vec_reverse
         procedure:: update => vec_update
     end type
@@ -211,12 +209,6 @@ contains
         dmp = vec%pop(i)
     end subroutine
 
-
-    subroutine vec_sort(vec)
-        class(vector):: vec
-
-        call merge_sort(vec%array(1:vec%size()))
-    end subroutine
 
     subroutine vec_reverse(vec)
         class(vector):: vec
