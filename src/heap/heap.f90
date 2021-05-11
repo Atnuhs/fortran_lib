@@ -87,6 +87,7 @@ contains
         val=h%val(1)
         h%val(1) = h%val(h%len)
         h%len=h%len-1
+        print*, 'pop', val
         call heap_down(h,1_prec)
     end function
 
@@ -130,8 +131,8 @@ contains
 
         do while(ind*2 <= h%len)
             c1 = ind*2; c2 = c1+1; c=c1
-            if (c2 <= h%len) c = merge(c1,c2,h%val(c1) >= h%val(c2))
-            if (h%val(c) <= h%val(ind)) return
+            if (c2 <= h%len) c = merge(c1,c2,h%val(c1) <= h%val(c2))
+            if (h%val(c) >= h%val(ind)) return
             call k_swap(h,c,ind)
             ind = c
         end do
@@ -142,6 +143,7 @@ contains
         class(heap),intent(inout):: h
         integer(prec):: i,v_ar(h%len)
 
+        v_ar(:)=0
         i=1
         do while(h_remain(h))
             v_ar(i) = h_pop(h)
@@ -274,8 +276,4 @@ program main
 
     print'(*(i0,1x))', hq%to_array()
 
-    do i=1,n
-        v = hq%pop()
-        print'(*(i0,1x))', i, v
-    end do
 end program main
