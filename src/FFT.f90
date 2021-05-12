@@ -65,14 +65,16 @@ contains
     contains
         subroutine swap(i,j)
             integer(int32),intent(in):: i,j
-            real(real64):: tr,ti
+            real(real64):: t1r,t1i,t2r,t2i
     
-            tr=ar(i)
-            ti=ai(i)
-            ar(i)=ar(j)
-            ai(i)=ai(j)
-            ar(j)=tr
-            ai(j)=ti
+            t1r=ar(i)
+            t2r=ar(j)
+            t1i=ai(i)
+            t2i=ai(j)
+            ar(j)=t1r
+            ar(i)=t2r
+            ai(j)=t1i
+            ai(i)=t2i
         end subroutine
     end subroutine
 

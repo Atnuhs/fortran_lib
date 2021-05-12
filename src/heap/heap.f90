@@ -269,7 +269,7 @@ program main
     read*, n
     hq = heap()
     do i=1,n
-        v = randint(100)
+        v = randrange(-100,100)
         print'(*(i0,1x))', i, v
         call hq%push(v)
     end do
