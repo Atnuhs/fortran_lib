@@ -94,11 +94,4 @@ program main
     print*, 'qaternion: ', q%val
     print*, 'rotation: ', matmul(q%coordinate_rotation_matrix(), p)
     print*, 'inv_rotation: ', matmul(q%coordinate_inv_rotation_matrix(), p)
-contains
-    function cross_product(v1,v2) result(ret)
-        real(real64),intent(in):: v1(3), v2(3)
-        real(real64):: ret(3)
-
-        
-    end function
 end program main
