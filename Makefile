@@ -1,69 +1,85 @@
+# ===========================================
+# md.f90 my_tcd.f90 my_msd.f90 のビルド手順
+# mantainer:: Shunta Abe
+# ===========================================
 
-# 共通設定 ----------------------------------------------------
-# FC = gfortran
-FC = ifort
+# ----------------------
+# 変数/共通設定
+# ----------------------
+vpath %.f90 ../src
 
-FASTOPTION = -O2 -xHost
-DEBUGOPTION =
+# モジュールのファイルリスト。（依存がある場合は依存先を左へ）
+SRCS := const.f90 fft.f90 md_input.f90 ana_func.f90 random.f90
+OBJS := ${SRCS:f90=o}
+DEPS := ${OBJS:o=d}
 
-# for gfortran
+# program ~ end programを持つファイルリスト
+# 追加する場合はビルド手順も既存のものに倣って書く。
+# make all にも書き足す。
+MD := md.f90
+MSD := my_msd.f90
+TCD := my_tcd.f90
+ALL := $(MD) $(MSD) $(TCD)
+
+# ----------------------
+# コンパイラ切り替え
+# ----------------------
+FC = gfortran
+# FC = ifort
+FASTOPTION = -O3
+DEBUGOPTION = -g
+PROFOPTION = -O0 -pg
 ifeq ($(FC),gfortran)
 	DEBUGOPTION += \
 	-Wall -pedantic -fbounds-check -O \
 	-Wuninitialized -ffpe-trap=invalid,zero,overflow
-endif
-
-# for ifort
-ifeq ($(FC),ifort)
+else ifeq ($(FC),ifort)
 	DEBUGOPTION += \
 	-check all -warn all -std -gen_interfaces \
 	-fpe0 -ftrapuv -traceback
+else
+$(error "FC" must be "gfortran" or "ifort")
 endif
 
-# md.out
-MD_TARGET = md.out
-MDDEBUG_TARGET = md_debug.out
-MD_OBJECTS = const.o md_input.o md.o
+# ------------------------
+# ビルド debug/fast切り替え
+# ------------------------
+# buildtype = debug
+# buildtype = prof
+buildtype = fast
+FFLAGS = 
+ifeq ($(buildtype),debug)
+	FFLAGS += $(DEBUGOPTION)
+else ifeq ($(buildtype),fast)
+	FFLAGS += $(FASTOPTION)
+else ifeq ($(buildtype),prof)
+	FFLAGS += $(PROFOPTION)
+else
+$(error "buildtype" must be "debug" or "fast")
+endif
 
-# tcd.out
-TCD_TARGET = my_tcd.out
-TCDDEBUG_TARGET = my_tcd_debug.out
-TCD_OBJECTS = const.o fft.o md_input.o ana_func.o my_tcd.o
+# ------------------
+# ビルド実行方法
+# ------------------
+.PHONY: clean all
+define COMPILE_MAIN
+${1:f90=out}: $(OBJS) ${1:f90=o}
+	$(FC) $(FFLAGS) -o ${1:f90=out} $(OBJS) ${1:f90=o}
+endef
 
-# msd.out
-MSD_TARGET = my_msd.out
-MSDDEBUG_TARGET = my_msd_debug.out
-MSD_OBJECTS = const.o fft.o md_input.o ana_func.o my_msd.o
+all: $(foreach t,$(ALL),$(t:f90=out))
 
+$(eval $(call COMPILE_MAIN,$(MD)))
+$(eval $(call COMPILE_MAIN,$(MSD)))
+$(eval $(call COMPILE_MAIN,$(TCD)))
 
-
-# 実行方法 ----------------------------------------------------
-
-.SUFFIXES: .f90
-%.o: %.f90
-	$(FC) -c $<
-
-# tcd.out
-${TCD_TARGET}: ${TCD_OBJECTS}
-	${FC} -o $@ ${TCD_OBJECTS} ${FASTOPTION}
-${TCDDEBUG_TARGET}: ${TCD_OBJECTS}
-	${FC} -o $@ ${TCD_OBJECTS} ${DEBUGOPTION}
-
-# msd.out
-${MSD_TARGET}: ${MSD_OBJECTS}
-	${FC} -o $@ ${MSD_OBJECTS} ${FASTOPTION}
-${MSDDEBUG_TARGET}: ${MSD_OBJECTS}
-	${FC} -o $@ ${MSD_OBJECTS} ${DEBUGOPTION}
-
-# md.out
-${MD_TARGET}: ${MD_OBJECTS}
-	${FC} -o $@ ${MD_OBJECTS} ${FASTOPTION}
-${MDDEBUG_TARGET}: ${MD_OBJECTS}
-	${FC} -o $@ ${MD_OBJECTS} ${DEBUGOPTION}
-
-
-# clean
-.PHONY: clean
 
 clean:
-	${RM} *.mod *.o *.out
+	${RM} *.mod *.o *.d *.out
+
+
+
+-include $(DEPS)
+
+%.o: %.f90
+	$(FC) $(FFLAGS) -cpp -MD -c -o $@ $<
