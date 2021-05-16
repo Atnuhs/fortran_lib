@@ -1,1 +1,1 @@
-{"buildTargets":["clean","md.out","md_debug.out","my_msd.out","my_msd_debug.out","my_tcd.out","my_tcd_debug.out"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}
+{"buildTargets":["all","clean","md.out","my_msd.out","my_tcd.out"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}

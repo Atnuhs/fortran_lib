@@ -1,5 +1,5 @@
 make all --print-data-base --no-builtin-variables --no-builtin-rules --question
-make: *** No rule to make target 'all'.  Stop.
+make: *** No rule to make target 'const.o', needed by 'md.out'.  Stop.
  
 # GNU Make 4.2.1
 # Built for x86_64-pc-linux-gnu
@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sun May 16 15:26:01 2021
+# Make data base, printed on Sun May 16 15:37:22 2021
 
 # Variables
 
@@ -56,8 +56,6 @@ MAKEFILE_LIST :=  Makefile
 @F = $(notdir $@)
 # environment
 APM = /opt/intel/oneapi/advisor/2021.2.0/perfmodels
-# makefile (from 'Makefile', line 26)
-MD_OBJECTS = const.o md_input.o md.o
 # 'override' directive
 GNUMAKEFLAGS := 
 # environment
@@ -66,8 +64,15 @@ TBBROOT = /opt/intel/oneapi/tbb/2021.2.0/env/..
 XDG_DATA_DIRS = /usr/local/share:/usr/share:/var/lib/snapd/desktop
 # environment
 VSCODE_VERBOSE_LOGGING = true
+# makefile (from 'Makefile', line 65)
+define COMPILE_MAIN
+${1:f90=out}: $(OBJS) ${1:f90=o}
+	$(FC) $(FFLAGS) -o ${1:f90=out} $(OBJS) ${1:f90=o}
+endef
 # environment
 IPPCP_TARGET_ARCH = intel64
+# makefile (from 'Makefile', line 13)
+OBJS := const.o fft.o md_input.o ana_func.o random.o
 # environment
 INFOPATH = /opt/intel/oneapi/debugger/10.1.1/documentation/info/
 # environment
@@ -82,14 +87,16 @@ VT_SLIB_DIR = /opt/intel/oneapi/itac/2021.2.0/slib
 VSCODE_CWD = /mnt/c/Users/color/AppData/Local/Programs/Microsoft VS Code
 # environment
 OCL_ICD_FILENAMES = libintelocl_emu.so:libalteracl.so:/opt/intel/oneapi/compiler/2021.2.0/linux/lib/x64/libintelocl.so
-# makefile (from 'Makefile', line 29)
-TCD_TARGET = my_tcd.out
 # default
 MAKE_HOST := x86_64-pc-linux-gnu
 # environment
 PATH = /home/authns/.vscode-server/bin/054a9295330880ed74ceaedda236253b4f39a335/bin:/opt/intel/oneapi/vtune/2021.3.0/bin64:/opt/intel/oneapi/vpl/2021.2.2/bin:/opt/intel/oneapi/mpi/2021.2.0//libfabric/bin:/opt/intel/oneapi/mpi/2021.2.0//bin:/opt/intel/oneapi/mkl/latest/bin/intel64:/opt/intel/oneapi/itac/2021.2.0/bin:/opt/intel/oneapi/itac/2021.2.0/bin:/opt/intel/oneapi/inspector/2021.2.0/bin64:/opt/intel/oneapi/dpcpp-ct/2021.2.0/bin:/opt/intel/oneapi/dev-utilities/2021.2.0/bin:/opt/intel/oneapi/debugger/10.1.1/gdb/intel64/bin:/opt/intel/oneapi/compiler/2021.2.0/linux/lib/oclfpga/llvm/aocl-bin:/opt/intel/oneapi/compiler/2021.2.0/linux/lib/oclfpga/bin:/opt/intel/oneapi/compiler/2021.2.0/linux/bin/intel64:/opt/intel/oneapi/compiler/2021.2.0/linux/bin:/opt/intel/oneapi/compiler/2021.2.0/linux/ioc/bin:/opt/intel/oneapi/clck/2021.2.2/bin/intel64:/opt/intel/oneapi/advisor/2021.2.0/bin64:/opt/intel/oneapi/intelpython/latest/bin:/home/authns/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/mnt/c/Program Files/Common Files/Oracle/Java/javapath:/mnt/c/Program Files (x86)/Common Files/Oracle/Java/javapath:/mnt/c/Program Files (x86)/Intel/iCLS Client:/mnt/c/Program Files/Intel/iCLS Client:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0:/mnt/c/Windows/System32/OpenSSH:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA NvDLISR:/mnt/c/Program Files (x86)/Intel/Intel(R) Management Engine Components/DAL:/mnt/c/Program Files/Intel/Intel(R) Management Engine Components/DAL:/mnt/c/Program Files (x86)/Intel/Intel(R) Management Engine Components/IPT:/mnt/c/Program Files/Intel/Intel(R) Management Engine Components/IPT:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/ProgramData/DockerDesktop/version-bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Users/color/.poetry/bin:/mnt/c/Users/color/AppData/Local/Programs/Python/Python39/Scripts:/mnt/c/Users/color/AppData/Local/Programs/Python/Python39:/mnt/c/Users/color/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/color/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Program Files/Java/jdk-15.0.2/bin:/snap/bin
+# makefile (from 'Makefile', line 19)
+MD := md.f90
 # environment
 CLCK_ROOT = /opt/intel/oneapi/clck/2021.2.2
+# makefile (from 'Makefile', line 54)
+FFLAGS =  $(FASTOPTION)
 # environment
 LIBRARY_PATH = /opt/intel/oneapi/vpl/2021.2.2/lib:/opt/intel/oneapi/tbb/2021.2.0/env/../lib/intel64/gcc4.8:/opt/intel/oneapi/mpi/2021.2.0//libfabric/lib:/opt/intel/oneapi/mpi/2021.2.0//lib/release:/opt/intel/oneapi/mpi/2021.2.0//lib:/opt/intel/oneapi/mkl/latest/lib/intel64:/opt/intel/oneapi/ippcp/2021.2.0/lib/intel64:/opt/intel/oneapi/ipp/2021.2.0/lib/intel64:/opt/intel/oneapi/dnnl/2021.2.0/cpu_dpcpp_gpu_dpcpp/lib:/opt/intel/oneapi/dal/2021.2.0/lib/intel64:/opt/intel/oneapi/compiler/2021.2.0/linux/compiler/lib/intel64_lin:/opt/intel/oneapi/compiler/2021.2.0/linux/lib:/opt/intel/oneapi/clck/2021.2.2/lib/intel64:/opt/intel/oneapi/ccl/2021.2.0/lib/cpu_gpu_dpcpp
 # environment
@@ -105,7 +112,7 @@ CONDA_PREFIX = /opt/intel/oneapi/intelpython/latest
 # environment
 VSCODE_LOG_STACK = false
 # environment
-VSCODE_IPC_HOOK_CLI = /tmp/vscode-ipc-2a90f311-4210-4390-8db6-7c6565de52d3.sock
+VSCODE_IPC_HOOK_CLI = /tmp/vscode-ipc-bec5bd3e-e9e7-4ede-abe7-404b9f6cbade.sock
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -114,8 +121,6 @@ CMAKE_PREFIX_PATH = /opt/intel/oneapi/vpl:/opt/intel/oneapi/tbb/2021.2.0/env/..:
 LS_COLORS = rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
 # environment
 CPLUS_INCLUDE_PATH = /opt/intel/oneapi/clck/2021.2.2/include
-# makefile (from 'Makefile', line 30)
-TCDDEBUG_TARGET = my_tcd_debug.out
 # automatic
 %F = $(notdir $%)
 # environment
@@ -124,12 +129,10 @@ DISPLAY = 192.168.80.1:0.0
 CONDA_EXE = /opt/intel/oneapi/intelpython/latest/bin/conda
 # environment
 VSCODE_PIPE_LOGGING = true
-# makefile (from 'Makefile', line 6)
-FASTOPTION = -O2 -xHost
+# makefile (from 'Makefile', line 29)
+FASTOPTION = -O3
 # environment
 PWD = /home/authns/programming/fortran_lib
-# makefile (from 'Makefile', line 34)
-MSD_TARGET = my_msd.out
 # environment
 VPL_LIB = /opt/intel/oneapi/vpl/2021.2.2/lib
 # default
@@ -148,14 +151,12 @@ MANPATH = /opt/intel/oneapi/mpi/2021.2.0/man:/opt/intel/oneapi/itac/2021.2.0/man
 VSCODE_AMD_ENTRYPOINT = vs/server/remoteExtensionHostProcess
 # environment
 HOME = /home/authns
-# makefile (from 'Makefile', line 35)
-MSDDEBUG_TARGET = my_msd_debug.out
 # environment
 VT_LIB_DIR = /opt/intel/oneapi/itac/2021.2.0/lib
 # environment
 LD_LIBRARY_PATH = /opt/intel/oneapi/vpl/2021.2.2/lib:/opt/intel/oneapi/tbb/2021.2.0/env/../lib/intel64/gcc4.8:/opt/intel/oneapi/mpi/2021.2.0//libfabric/lib:/opt/intel/oneapi/mpi/2021.2.0//lib/release:/opt/intel/oneapi/mpi/2021.2.0//lib:/opt/intel/oneapi/mkl/latest/lib/intel64:/opt/intel/oneapi/itac/2021.2.0/slib:/opt/intel/oneapi/ippcp/2021.2.0/lib/intel64:/opt/intel/oneapi/ipp/2021.2.0/lib/intel64:/opt/intel/oneapi/dnnl/2021.2.0/cpu_dpcpp_gpu_dpcpp/lib:/opt/intel/oneapi/debugger/10.1.1/dep/lib:/opt/intel/oneapi/debugger/10.1.1/libipt/intel64/lib:/opt/intel/oneapi/debugger/10.1.1/gdb/intel64/lib:/opt/intel/oneapi/dal/2021.2.0/lib/intel64:/opt/intel/oneapi/compiler/2021.2.0/linux/lib:/opt/intel/oneapi/compiler/2021.2.0/linux/lib/x64:/opt/intel/oneapi/compiler/2021.2.0/linux/lib/emu:/opt/intel/oneapi/compiler/2021.2.0/linux/lib/oclfpga/host/linux64/lib:/opt/intel/oneapi/compiler/2021.2.0/linux/lib/oclfpga/linux64/lib:/opt/intel/oneapi/compiler/2021.2.0/linux/compiler/lib/intel64_lin:/opt/intel/oneapi/compiler/2021.2.0/linux/compiler/lib:/opt/intel/oneapi/ccl/2021.2.0/lib/cpu_gpu_dpcpp
-# makefile (from 'Makefile', line 18)
-DEBUGOPTION =  -check all -warn all -std -gen_interfaces -fpe0 -ftrapuv -traceback
+# makefile (from 'Makefile', line 33)
+DEBUGOPTION = -g -Wall -pedantic -fbounds-check -O -Wuninitialized -ffpe-trap=invalid,zero,overflow
 # environment
 VT_ADD_LIBS = -ldwarf -lelf -lvtunwind -lm -lpthread
 # environment
@@ -170,6 +171,8 @@ APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
 CONDA_PROMPT_MODIFIER = (base) 
 # environment
 LESSCLOSE = /usr/bin/lesspipe %s %s
+# makefile (from 'Makefile', line 49)
+buildtype = fast
 # environment
 VPL_BIN = /opt/intel/oneapi/vpl/2021.2.2/bin
 # environment
@@ -184,6 +187,8 @@ CONDA_DEFAULT_ENV = base
 MAKE = $(MAKE_COMMAND)
 # default
 MAKECMDGOALS := all
+# makefile (from 'Makefile', line 12)
+SRCS := const.f90 fft.f90 md_input.f90 ana_func.f90 random.f90
 # environment
 CONDA_SHLVL = 2
 # environment
@@ -192,22 +197,24 @@ SHLVL = 0
 MAKE_VERSION := 4.2.1
 # environment
 USER = authns
-# makefile (from 'Makefile', line 4)
-FC = ifort
+# makefile (from 'Makefile', line 27)
+FC = gfortran
 # environment
 MKLROOT = /opt/intel/oneapi/mkl/latest
 # makefile
-.DEFAULT_GOAL := my_tcd.out
+.DEFAULT_GOAL := all
 # environment
 NAME = KOKUDENNOU
 # environment
 CLASSPATH = /opt/intel/oneapi/mpi/2021.2.0//lib/mpi.jar:/opt/intel/oneapi/dal/2021.2.0/lib/onedal.jar
+# makefile (from 'Makefile', line 22)
+ALL := md.f90 my_msd.f90 my_tcd.f90
 # environment
 INSPECTOR_2021_DIR = /opt/intel/oneapi/inspector/2021.2.0
 # automatic
 %D = $(patsubst %/,%,$(dir $%))
 # makefile (from 'Makefile', line 31)
-TCD_OBJECTS = const.o fft.o md_input.o ana_func.o my_tcd.o
+PROFOPTION = -O0 -pg
 # environment
 VSCODE_WSL_EXT_LOCATION = /mnt/c/Users/color/.vscode/extensions/ms-vscode-remote.remote-wsl-0.56.2
 # default
@@ -228,8 +235,6 @@ MAKEFLAGS = pqrR
 MFLAGS = -pqrR
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
-# makefile (from 'Makefile', line 24)
-MD_TARGET = md.out
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # environment
@@ -238,6 +243,8 @@ DALROOT = /opt/intel/oneapi/dal/2021.2.0
 +F = $(notdir $+)
 # environment
 I_MPI_ROOT = /opt/intel/oneapi/mpi/2021.2.0
+# makefile (from 'Makefile', line 21)
+TCD := my_tcd.f90
 # environment
 VPL_ROOT = /opt/intel/oneapi/vpl/2021.2.2
 # environment
@@ -248,29 +255,27 @@ MAKEFILES :=
 DAL_MINOR_BINARY = 1
 # automatic
 <F = $(notdir $<)
-# makefile (from 'Makefile', line 36)
-MSD_OBJECTS = const.o fft.o md_input.o ana_func.o my_msd.o
 # environment
 LC_ALL = C
 # environment
 CONDA_PYTHON_EXE = /opt/intel/oneapi/intelpython/latest/bin/python
 # environment
 DAALROOT = /opt/intel/oneapi/dal/2021.2.0
-# makefile (from 'Makefile', line 25)
-MDDEBUG_TARGET = md_debug.out
 # environment
 HOSTTYPE = x86_64
 # automatic
 ^F = $(notdir $^)
+# makefile (from 'Makefile', line 14)
+DEPS := const.d fft.d md_input.d ana_func.d random.d
 # default
 SUFFIXES := 
+ 
 # environment
 _CE_M = 
 # environment
 NLSPATH = /opt/intel/oneapi/mkl/latest/lib/intel64/locale/%l_%t/%N
 # environment
 INTELFPGAOCLSDKROOT = /opt/intel/oneapi/compiler/2021.2.0/linux/lib/oclfpga
- 
 # default
 .INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
 # environment
@@ -279,6 +284,8 @@ VSCODE_INJECT_NODE_MODULE_LOOKUP_PATH = /home/authns/.vscode-server/bin/054a9295
 .RECIPEPREFIX := 
 # environment
 VTUNE_PROFILER_2021_DIR = /opt/intel/oneapi/vtune/2021.3.0
+# makefile (from 'Makefile', line 20)
+MSD := my_msd.f90
 # environment
 LANG = C
 # environment
@@ -294,7 +301,7 @@ _CE_CONDA =
 # environment
 IPPCRYPTOROOT = /opt/intel/oneapi/ippcp/2021.2.0
 # variable set hash-table stats:
-# Load=140/1024=14%, Rehash=0, Collisions=14/181=8%
+# Load=142/1024=14%, Rehash=0, Collisions=25/205=12%
 
 # Pattern-specific Variable Values
 
@@ -302,21 +309,33 @@ IPPCRYPTOROOT = /opt/intel/oneapi/ippcp/2021.2.0
 
 # Directories
 
-# . (device 2096, inode 163102): 11 files, no impossibilities.
+# . (device 2096, inode 163102): 11 files, 1 impossibilities.
+# ../src: could not be stat'd.
 
-# 11 files, no impossibilities in 1 directories.
+# 11 files, 1 impossibilities in 2 directories.
 
 # Implicit Rules
 
 %.o: %.f90
-#  recipe to execute (from 'Makefile', line 44):
-	$(FC) -c $<
+#  recipe to execute (from 'Makefile', line 85):
+	$(FC) $(FFLAGS) -cpp -MD -c -o $@ $<
 
-%.f90:
-
-# 2 implicit rules, 0 (0.0%) terminal.
+# 1 implicit rules, 0 (0.0%) terminal.
 
 # Files
+
+# Not a target:
+ana_func.d:
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
+
+# Not a target:
+random.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 # Not a target:
 fft.o:
@@ -324,31 +343,24 @@ fft.o:
 #  Modification time never checked.
 #  File has not been updated.
 
-# Not a target:
-all:
+all: md.out my_msd.out my_tcd.out
+#  Phony target (prerequisite of .PHONY).
 #  Command line target.
-#  Implicit rule search has been done.
+#  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
 
-md.out: const.o md_input.o md.o
+md.out: const.o fft.o md_input.o ana_func.o random.o md.o
 #  Implicit rule search has not been done.
-#  Modification time never checked.
+#  File does not exist.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 60):
-	${FC} -o $@ ${MD_OBJECTS} ${FASTOPTION}
+#  recipe to execute (from 'Makefile', line 72):
+	gfortran  -O3 -o md.out const.o fft.o md_input.o ana_func.o random.o md.o
 
-.PHONY: clean
+.PHONY: clean all
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-
-my_msd_debug.out: const.o fft.o md_input.o ana_func.o my_msd.o
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  recipe to execute (from 'Makefile', line 56):
-	${FC} -o $@ ${MSD_OBJECTS} ${DEBUGOPTION}
 
 # Not a target:
 my_msd.o:
@@ -356,15 +368,10 @@ my_msd.o:
 #  Modification time never checked.
 #  File has not been updated.
 
-.SUFFIXES: .f90
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2021-05-16 15:24:38.53
+#  Last modified 2021-05-16 15:37:02.709
 #  File has been updated.
 #  Successfully updated.
 
@@ -374,12 +381,19 @@ ana_func.o:
 #  Modification time never checked.
 #  File has not been updated.
 
-my_tcd_debug.out: const.o fft.o md_input.o ana_func.o my_tcd.o
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  recipe to execute (from 'Makefile', line 50):
-	${FC} -o $@ ${TCD_OBJECTS} ${DEBUGOPTION}
+# Not a target:
+md_input.d:
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
+
+# Not a target:
+const.d:
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
 
 # Not a target:
 my_tcd.o:
@@ -387,12 +401,12 @@ my_tcd.o:
 #  Modification time never checked.
 #  File has not been updated.
 
-my_msd.out: const.o fft.o md_input.o ana_func.o my_msd.o
+my_msd.out: const.o fft.o md_input.o ana_func.o random.o my_msd.o
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 54):
-	${FC} -o $@ ${MSD_OBJECTS} ${FASTOPTION}
+#  recipe to execute (from 'Makefile', line 73):
+	gfortran  -O3 -o my_msd.out const.o fft.o md_input.o ana_func.o random.o my_msd.o
 
 # Not a target:
 .DEFAULT:
@@ -405,8 +419,8 @@ clean:
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 69):
-	${RM} *.mod *.o *.out
+#  recipe to execute (from 'Makefile', line 78):
+	${RM} *.mod *.o *.d *.out
 
 # Not a target:
 md_input.o:
@@ -415,17 +429,24 @@ md_input.o:
 #  File has not been updated.
 
 # Not a target:
+random.d:
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
+
+# Not a target:
 const.o:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
+#  Implicit rule search has been done.
+#  File does not exist.
 #  File has not been updated.
 
-md_debug.out: const.o md_input.o md.o
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  recipe to execute (from 'Makefile', line 62):
-	${FC} -o $@ ${MD_OBJECTS} ${DEBUGOPTION}
+# Not a target:
+fft.d:
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
 
 # Not a target:
 md.o:
@@ -433,33 +454,29 @@ md.o:
 #  Modification time never checked.
 #  File has not been updated.
 
-my_tcd.out: const.o fft.o md_input.o ana_func.o my_tcd.o
+my_tcd.out: const.o fft.o md_input.o ana_func.o random.o my_tcd.o
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'Makefile', line 48):
-	${FC} -o $@ ${TCD_OBJECTS} ${FASTOPTION}
-
-# Not a target:
-.f90:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 74):
+	gfortran  -O3 -o my_tcd.out const.o fft.o md_input.o ana_func.o random.o my_tcd.o
 
 # files hash-table stats:
-# Load=20/1024=2%, Rehash=0, Collisions=0/60=0%
+# Load=22/1024=2%, Rehash=0, Collisions=0/71=0%
 # VPATH Search Paths
 
-# No 'vpath' search paths.
+vpath %.f90 ../src
+
+# 1 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 34 / storage = 293 B / avg = 8 B
-# current buf: size = 8162 B / used = 293 B / count = 34 / avg = 8 B
+# strcache buffers: 1 (0) / strings = 38 / storage = 312 B / avg = 8 B
+# current buf: size = 8162 B / used = 312 B / count = 38 / avg = 8 B
 
-# strcache performance: lookups = 69 / hit rate = 50%
+# strcache performance: lookups = 73 / hit rate = 47%
 # hash-table stats:
-# Load=34/8192=0%, Rehash=0, Collisions=3/69=4%
-# Finished Make data base on Sun May 16 15:26:01 2021
+# Load=38/8192=0%, Rehash=0, Collisions=1/73=1%
+# Finished Make data base on Sun May 16 15:37:22 2021
 
  
