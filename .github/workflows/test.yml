@@ -4,12 +4,25 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: test
+      - uses: actions/checkout@v1
+      - name: see-loc-and-ver
         run: |
-          # sudo apt update && sudo apt upgrade
+          pwd
+          ls
+          gfortran --version
+
+      - name: update-ubuntu
+        run: |
+          sudo apt update
+          sudo apt upgrade
+
+      - name: install-env
+        run: |
           sudo apt install cmake cmake-curses-gui
+
+      - name: cmake-exec
+        run: |
           mkdir build && cd build
           cmake ..
           make
           ./test/test_random/test_random.out
-
