@@ -49,7 +49,7 @@ contains
     end function
 
     function inv(q) result(ret)
-        type(quaternion_type),intent(in):: q
+        type(quaternion_type),intent(in):: q 
         type(quaternion_type):: ret
 
         ret = q
