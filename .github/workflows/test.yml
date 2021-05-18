@@ -6,9 +6,4 @@ jobs:
     steps:
       - name: test
         run: |
-          sudo apt update && sudo apt upgrade
-          sudo apt install cmake cmake-curses-gui
-          mkdir build && cd build
-          cmake ..
-          make
-          ./test/test_random/test_random.out
+          pwd
