@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.0)
+project(test_fortran_lib)
+enable_language(Fortran)
+project(test_module Fortran)
+add_subdirectory(src)
+add_subdirectory(test)
