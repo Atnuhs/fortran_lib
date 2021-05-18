@@ -6,5 +6,4 @@ jobs:
     steps:
       - name: test
         run: |
-          pwd
           ls
