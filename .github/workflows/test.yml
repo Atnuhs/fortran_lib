@@ -1,7 +1,14 @@
-name: learn-github-actions
+name: test
 on: [push]
 jobs:
-  check-gfortran-version:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - run: gfortran --version
+      - uses: actions/checkout@v2
+      - run: |
+        sudo apt update && sudo apt upgrade
+        sudo apt install cmake cmake-curses-gui
+        mkdir build && cd build
+        cmake ..
+        make
+        ./test/test_random/test_random.out
