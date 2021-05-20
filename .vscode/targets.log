@@ -8,7 +8,7 @@ make: *** No rule to make target 'const.o', needed by 'md.out'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sun May 16 15:37:22 2021
+# Make data base, printed on Wed May 19 21:57:40 2021
 
 # Variables
 
@@ -90,7 +90,7 @@ OCL_ICD_FILENAMES = libintelocl_emu.so:libalteracl.so:/opt/intel/oneapi/compiler
 # default
 MAKE_HOST := x86_64-pc-linux-gnu
 # environment
-PATH = /home/authns/.vscode-server/bin/054a9295330880ed74ceaedda236253b4f39a335/bin:/opt/intel/oneapi/vtune/2021.3.0/bin64:/opt/intel/oneapi/vpl/2021.2.2/bin:/opt/intel/oneapi/mpi/2021.2.0//libfabric/bin:/opt/intel/oneapi/mpi/2021.2.0//bin:/opt/intel/oneapi/mkl/latest/bin/intel64:/opt/intel/oneapi/itac/2021.2.0/bin:/opt/intel/oneapi/itac/2021.2.0/bin:/opt/intel/oneapi/inspector/2021.2.0/bin64:/opt/intel/oneapi/dpcpp-ct/2021.2.0/bin:/opt/intel/oneapi/dev-utilities/2021.2.0/bin:/opt/intel/oneapi/debugger/10.1.1/gdb/intel64/bin:/opt/intel/oneapi/compiler/2021.2.0/linux/lib/oclfpga/llvm/aocl-bin:/opt/intel/oneapi/compiler/2021.2.0/linux/lib/oclfpga/bin:/opt/intel/oneapi/compiler/2021.2.0/linux/bin/intel64:/opt/intel/oneapi/compiler/2021.2.0/linux/bin:/opt/intel/oneapi/compiler/2021.2.0/linux/ioc/bin:/opt/intel/oneapi/clck/2021.2.2/bin/intel64:/opt/intel/oneapi/advisor/2021.2.0/bin64:/opt/intel/oneapi/intelpython/latest/bin:/home/authns/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/mnt/c/Program Files/Common Files/Oracle/Java/javapath:/mnt/c/Program Files (x86)/Common Files/Oracle/Java/javapath:/mnt/c/Program Files (x86)/Intel/iCLS Client:/mnt/c/Program Files/Intel/iCLS Client:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0:/mnt/c/Windows/System32/OpenSSH:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA NvDLISR:/mnt/c/Program Files (x86)/Intel/Intel(R) Management Engine Components/DAL:/mnt/c/Program Files/Intel/Intel(R) Management Engine Components/DAL:/mnt/c/Program Files (x86)/Intel/Intel(R) Management Engine Components/IPT:/mnt/c/Program Files/Intel/Intel(R) Management Engine Components/IPT:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/ProgramData/DockerDesktop/version-bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Users/color/.poetry/bin:/mnt/c/Users/color/AppData/Local/Programs/Python/Python39/Scripts:/mnt/c/Users/color/AppData/Local/Programs/Python/Python39:/mnt/c/Users/color/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/color/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Program Files/Java/jdk-15.0.2/bin:/snap/bin
+PATH = /home/authns/.vscode-server/bin/054a9295330880ed74ceaedda236253b4f39a335/bin:/home/authns/.local/bin:/opt/intel/oneapi/vtune/2021.3.0/bin64:/opt/intel/oneapi/vpl/2021.2.2/bin:/opt/intel/oneapi/mpi/2021.2.0//libfabric/bin:/opt/intel/oneapi/mpi/2021.2.0//bin:/opt/intel/oneapi/mkl/latest/bin/intel64:/opt/intel/oneapi/itac/2021.2.0/bin:/opt/intel/oneapi/itac/2021.2.0/bin:/opt/intel/oneapi/inspector/2021.2.0/bin64:/opt/intel/oneapi/dpcpp-ct/2021.2.0/bin:/opt/intel/oneapi/dev-utilities/2021.2.0/bin:/opt/intel/oneapi/debugger/10.1.1/gdb/intel64/bin:/opt/intel/oneapi/compiler/2021.2.0/linux/lib/oclfpga/llvm/aocl-bin:/opt/intel/oneapi/compiler/2021.2.0/linux/lib/oclfpga/bin:/opt/intel/oneapi/compiler/2021.2.0/linux/bin/intel64:/opt/intel/oneapi/compiler/2021.2.0/linux/bin:/opt/intel/oneapi/compiler/2021.2.0/linux/ioc/bin:/opt/intel/oneapi/clck/2021.2.2/bin/intel64:/opt/intel/oneapi/advisor/2021.2.0/bin64:/opt/intel/oneapi/intelpython/latest/bin:/home/authns/anaconda3/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/mnt/c/Program Files/Common Files/Oracle/Java/javapath:/mnt/c/Program Files (x86)/Common Files/Oracle/Java/javapath:/mnt/c/Program Files (x86)/Intel/iCLS Client:/mnt/c/Program Files/Intel/iCLS Client:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0:/mnt/c/Windows/System32/OpenSSH:/mnt/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/mnt/c/Program Files/NVIDIA Corporation/NVIDIA NvDLISR:/mnt/c/Program Files (x86)/Intel/Intel(R) Management Engine Components/DAL:/mnt/c/Program Files/Intel/Intel(R) Management Engine Components/DAL:/mnt/c/Program Files (x86)/Intel/Intel(R) Management Engine Components/IPT:/mnt/c/Program Files/Intel/Intel(R) Management Engine Components/IPT:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/ProgramData/DockerDesktop/version-bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Users/color/.poetry/bin:/mnt/c/Users/color/AppData/Local/Programs/Python/Python39/Scripts:/mnt/c/Users/color/AppData/Local/Programs/Python/Python39:/mnt/c/Users/color/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/color/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Program Files/Java/jdk-15.0.2/bin:/snap/bin
 # makefile (from 'Makefile', line 19)
 MD := md.f90
 # environment
@@ -112,7 +112,7 @@ CONDA_PREFIX = /opt/intel/oneapi/intelpython/latest
 # environment
 VSCODE_LOG_STACK = false
 # environment
-VSCODE_IPC_HOOK_CLI = /tmp/vscode-ipc-bec5bd3e-e9e7-4ede-abe7-404b9f6cbade.sock
+VSCODE_IPC_HOOK_CLI = /tmp/vscode-ipc-b08422c3-554a-429f-be42-b97aefd766d2.sock
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -124,7 +124,7 @@ CPLUS_INCLUDE_PATH = /opt/intel/oneapi/clck/2021.2.2/include
 # automatic
 %F = $(notdir $%)
 # environment
-DISPLAY = 192.168.80.1:0.0
+DISPLAY = 172.17.208.1:0.0
 # environment
 CONDA_EXE = /opt/intel/oneapi/intelpython/latest/bin/conda
 # environment
@@ -138,7 +138,7 @@ VPL_LIB = /opt/intel/oneapi/vpl/2021.2.2/lib
 # default
 .LOADED := 
 # environment
-WSL_INTEROP = /run/WSL/12_interop
+WSL_INTEROP = /run/WSL/1700_interop
 # environment
 PKG_CONFIG_PATH = /opt/intel/oneapi/vtune/2021.3.0/include/pkgconfig/lib64:/opt/intel/oneapi/vpl/2021.2.2/lib/pkgconfig:/opt/intel/oneapi/mkl/latest/tools/pkgconfig:/opt/intel/oneapi/inspector/2021.2.0/include/pkgconfig/lib64:/opt/intel/oneapi/advisor/2021.2.0/include/pkgconfig/lib64:
 # environment
@@ -268,8 +268,8 @@ HOSTTYPE = x86_64
 # makefile (from 'Makefile', line 14)
 DEPS := const.d fft.d md_input.d ana_func.d random.d
 # default
-SUFFIXES := 
  
+SUFFIXES := 
 # environment
 _CE_M = 
 # environment
@@ -295,13 +295,11 @@ VSCODE_EXTHOST_WILL_SEND_SOCKET = true
 # environment
 WSL_DISTRO_NAME = Ubuntu-20.04
 # environment
-MOTD_SHOWN = update-motd
-# environment
 _CE_CONDA = 
 # environment
 IPPCRYPTOROOT = /opt/intel/oneapi/ippcp/2021.2.0
 # variable set hash-table stats:
-# Load=142/1024=14%, Rehash=0, Collisions=25/205=12%
+# Load=141/1024=14%, Rehash=0, Collisions=25/204=12%
 
 # Pattern-specific Variable Values
 
@@ -309,10 +307,10 @@ IPPCRYPTOROOT = /opt/intel/oneapi/ippcp/2021.2.0
 
 # Directories
 
-# . (device 2096, inode 163102): 11 files, 1 impossibilities.
+# . (device 2096, inode 163102): 14 files, 1 impossibilities.
 # ../src: could not be stat'd.
 
-# 11 files, 1 impossibilities in 2 directories.
+# 14 files, 1 impossibilities in 2 directories.
 
 # Implicit Rules
 
@@ -471,12 +469,12 @@ vpath %.f90 ../src
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 38 / storage = 312 B / avg = 8 B
-# current buf: size = 8162 B / used = 312 B / count = 38 / avg = 8 B
+# strcache buffers: 1 (0) / strings = 41 / storage = 341 B / avg = 8 B
+# current buf: size = 8162 B / used = 341 B / count = 41 / avg = 8 B
 
-# strcache performance: lookups = 73 / hit rate = 47%
+# strcache performance: lookups = 76 / hit rate = 46%
 # hash-table stats:
-# Load=38/8192=0%, Rehash=0, Collisions=1/73=1%
-# Finished Make data base on Sun May 16 15:37:22 2021
+# Load=41/8192=1%, Rehash=0, Collisions=1/76=1%
+# Finished Make data base on Wed May 19 21:57:40 2021
 
  

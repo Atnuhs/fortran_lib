@@ -1,6 +1,5 @@
-set(EXECUTABLE test_random.out)
+set(RANDOM_TEST random_test.out)
 
-add_executable(${EXECUTABLE}
+add_executable(${RANDOM_TEST}
     test_random.f90
-    random.f90
 )

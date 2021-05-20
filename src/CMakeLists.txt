@@ -1,6 +1,6 @@
-set(STATIC_LIB random)
+set(RANDOM_MOD random_mod)
 
-add_library(${STATIC_lIB}
+add_library(${RANDOM_MOD}
     STATIC
     random.f90
 )
