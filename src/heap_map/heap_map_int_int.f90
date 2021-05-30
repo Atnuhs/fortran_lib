@@ -7,6 +7,7 @@ module heap_map_int_int_mod
     !  1. 値の符号を変えてpush
     !  2. popやtopで取得した値は符号を元に戻すのを忘れずに。
     use,intrinsic :: iso_fortran_env
+    implicit none
     private
     public:: double_heap_sort
     type, public:: heap_map_int_int
@@ -153,7 +154,7 @@ contains
 
         do while(ind > 1)
             c = ind/2
-            if (hm%key(ind) <= hm%key(c)) return
+            if (hm%key(ind) > hm%key(c)) return
             call kv_swap(hm, ind, c)
             ind=c 
         end do
@@ -167,8 +168,8 @@ contains
 
         do while(ind*2 <= hm%len)
             c1 = ind*2; c2 = c1+1; c = c1
-            if (c2 <= hm%len) c = merge(c1, c2, hm%key(c1) >= hm%key(c2))
-            if (hm%key(c) <= hm%key(ind)) return
+            if (c2 <= hm%len) c = merge(c1, c2, hm%key(c1) < hm%key(c2))
+            if (hm%key(c) > hm%key(ind)) return
             call kv_swap(hm, c, ind)
             ind = c
         end do
@@ -178,7 +179,9 @@ contains
     subroutine hm_to_array(hm, k_ar, v_ar)
         class(heap_map_int_int):: hm
         integer(int64):: k_ar(hm%len), v_ar(hm%len)
+        integer(int64):: i
 
+        i=1
         do while(hm_remain(hm))
             call hm_pop(hm,k_ar(i), v_ar(i))
             i=i+1
@@ -199,8 +202,8 @@ contains
         type(heap_map_int_int),intent(inout):: hm
         integer(int32),intent(in):: i1,i2
         
-        call swapk(hm%key(i1),hm%key(i2))
-        call swapv(hm%val(i1),hm%val(i2))
+        call swap(hm%key(i1),hm%key(i2))
+        call swap(hm%val(i1),hm%val(i2))
     contains
         subroutine swap(x, y)
             integer(int64),intent(inout):: x,y
