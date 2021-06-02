@@ -1,14 +1,13 @@
-module heap_mod
+module heap_int32_mod
     ! 最小値を素早く返します。
     ! 最大値を素早く返したい場合
     !  1. 値の符号を変えてpush
     !  2. popやtopで取得した値は符号を元に戻すのを忘れずに。
     use,intrinsic :: iso_fortran_env
-    private
-    integer(int32),private,parameter:: prec=int32
+    private 
     type, public:: heap
-        integer(prec),private:: len
-        integer(prec), allocatable,private:: val(:)
+        integer(int32),private:: len
+        integer(int32),allocatable:: val(:)
     contains
         procedure:: size => h_size
         procedure:: remain => h_remain
@@ -30,7 +29,7 @@ contains
 
 
     function init_h_with_len(n) result(h)
-        integer(prec),intent(in):: n
+        integer(int32),intent(in):: n
         type(heap):: h
         h%len=0
         allocate(h%val(n))
@@ -38,19 +37,20 @@ contains
     
 
     function init_h_with_ar(v_ar) result(h)
-        integer(prec),intent(in):: v_ar(:)
-        integer(prec):: i
+        integer(int32),intent(in):: v_ar(:)
+        integer(int32):: i
         type(heap):: h
 
-        h = heap(size(v_ar))
-        do i=1,size(v_ar)
-            call h_push(h,v_ar(i))
+        h%len = size(v_ar)
+        allocate(h%val(h%len), source=v_ar)
+        do i=h%len/2,1,-1
+            call heap_down(h,i)
         end do
     end function
 
     function h_size(h) result(ret)
         class(heap),intent(in):: h
-        integer(prec):: ret
+        integer(int32):: ret
 
         ret = h%len
     end function
@@ -65,7 +65,7 @@ contains
 
     subroutine h_push(h,val)
         class(heap),intent(inout):: h
-        integer(prec),intent(in):: val
+        integer(int32),intent(in):: val
         if (h%len+1 >= size(h%val)) call add(h)
         h%len=h%len+1
         h%val(h%len) = val
@@ -75,7 +75,7 @@ contains
 
     function h_top(h) result(val)
         class(heap),intent(in):: h
-        integer(prec):: val
+        integer(int32):: val
 
         val=h%val(1)
     end function
@@ -83,12 +83,12 @@ contains
 
     function h_pop(h) result(val)
         class(heap),intent(inout):: h
-        integer(prec):: val
+        integer(int32):: val
         val=h%val(1)
         h%val(1) = h%val(h%len)
         h%len=h%len-1
         print*, 'pop', val
-        call heap_down(h,1_prec)
+        call heap_down(h,1_int32)
     end function
 
 
@@ -99,9 +99,9 @@ contains
 
 
     subroutine add_array(ar)
-        integer(prec),allocatable,intent(inout):: ar(:)
-        integer(prec),allocatable:: tmp(:)
-        integer(prec):: l
+        integer(int32),allocatable,intent(inout):: ar(:)
+        integer(int32),allocatable:: tmp(:)
+        integer(int32):: l
 
         l = size(ar)
         allocate(tmp(1:2*l))
@@ -112,8 +112,8 @@ contains
 
     subroutine heap_up(h,ind)
         class(heap),intent(inout):: h
-        integer(prec),value:: ind
-        integer(prec):: p
+        integer(int32),value:: ind
+        integer(int32):: p
 
         do while(ind > 1)
             p = ind/2
@@ -126,8 +126,8 @@ contains
 
     subroutine heap_down(h,ind)
         class(heap),intent(inout):: h
-        integer(prec),value:: ind
-        integer(prec):: c1,c2,c
+        integer(int32),value:: ind
+        integer(int32):: c1,c2,c
 
         do while(ind*2 <= h%len)
             c1 = ind*2; c2 = c1+1; c=c1
@@ -141,7 +141,7 @@ contains
 
     function h_to_array(h) result(v_ar)
         class(heap),intent(inout):: h
-        integer(prec):: i,v_ar(h%len)
+        integer(int32):: i,v_ar(h%len)
 
         v_ar(:)=0
         i=1
@@ -154,8 +154,8 @@ contains
 
     function heap_sort(v_ar) result(ret)
         type(heap):: h
-        integer(prec),intent(in):: v_ar(:)
-        integer(prec):: ret(size(v_ar))
+        integer(int32),intent(in):: v_ar(:)
+        integer(int32):: ret(size(v_ar))
 
         h = heap(v_ar)
         ret = h_to_array(h)
@@ -164,13 +164,13 @@ contains
 
     subroutine k_swap(h,i1,i2)
         type(heap),intent(inout):: h
-        integer(prec),intent(in):: i1,i2
+        integer(int32),intent(in):: i1,i2
         
         call swap(h%val(i1),h%val(i2))
     contains
         subroutine swap(x,y)
-            integer(prec),intent(inout):: x, y
-            integer(prec):: tx, ty
+            integer(int32),intent(inout):: x, y
+            integer(int32):: tx, ty
 
             tx = x; ty = y
             x = ty; y = tx

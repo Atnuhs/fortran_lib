@@ -5,7 +5,7 @@ module deque_int32_mod
     public:: dq_debug_print
 
     type,public:: deque
-        integer(int32),allocatable,private:: array(:)
+        integer(int32),allocatable:: array(:)
         integer(int32),private:: l=1,r=0
     contains
         procedure:: push_back => dq_push_back, push_front => dq_push_front
@@ -262,7 +262,7 @@ module deque_int64_mod
     public:: dq_debug_print
 
     type,public:: deque
-        integer(int64),allocatable,private:: array(:)
+        integer(int64),allocatable:: array(:)
         integer(int32),private:: l=1, r=0
     contains
         procedure:: push_back => dq_push_back, push_front => dq_push_front
@@ -520,7 +520,7 @@ module deque_real64_mod
     public:: dq_debug_print
 
     type,public:: deque
-        real(real64),allocatable,private:: array(:)
+        real(real64),allocatable:: array(:)
         integer(int32),private:: l=1, r=0
     contains
         procedure:: push_back => dq_push_back, push_front => dq_push_front
