@@ -47,9 +47,8 @@
 module math_mod
     use,intrinsic :: iso_fortran_env
     implicit none
-    integer(int32),parameter:: prec = int64
 contains
-    function mod_pow(base,exponent,m) result(ret)
+    function mod_pow(base, exponent, m) result(ret)
         use,intrinsic :: iso_fortran_env
         integer(int64),intent(in):: m
         integer(int64),value:: base, exponent
@@ -65,13 +64,13 @@ contains
 
 
     recursive function mod_inv(a,m) result(ret)
-        integer(prec),intent(in):: a,m
-        integer(prec):: ret, gcd_ma, x, y
+        integer(int64),intent(in):: a,m
+        integer(int64):: ret, gcd_ma, x, y
 
         gcd_ma = extgcd(a,m,x,y)
         
-        if (gcd_ma /= 1_prec) then
-            ret = -1_prec
+        if (gcd_ma /= 1_int64) then
+            ret = -1_int64
         else
             ret = modulo(x,m)
         end if
@@ -79,18 +78,18 @@ contains
 
 
     function lcm(a, b) result(ret)
-        integer(prec),intent(in):: a,b
-        integer(prec):: ret
+        integer(int64),intent(in):: a,b
+        integer(int64):: ret
 
         ret = a*b/gcd(a,b)
     end function
 
 
     recursive function gcd(a, b) result(ret)
-        integer(prec),intent(in):: a,b
-        integer(prec):: ret
+        integer(int64),intent(in):: a,b
+        integer(int64):: ret
 
-        if (b == 0_prec) then
+        if (b == 0_int64) then
             ret = a
         else
             ret = gcd(b, mod(a,b))
@@ -99,14 +98,14 @@ contains
 
 
     recursive function extgcd(a, b, x, y) result(ret)
-        integer(prec),value:: a,b
-        integer(prec),intent(out):: x,y
-        integer(prec):: ret ! gcd(a,b)
+        integer(int64),value:: a,b
+        integer(int64),intent(out):: x,y
+        integer(int64):: ret ! gcd(a,b)
 
-        if (b==0_prec) then
+        if (b==0_int64) then
             ret = a
-            x = 1_prec
-            y = 0_prec
+            x = 1_int64
+            y = 0_int64
         else
             ret = extgcd(b, mod(a,b), y, x)
             y = y - a/b * x
@@ -115,17 +114,17 @@ contains
 
 
     function chineserem(b, m, md) result(ret)
-        integer(prec),allocatable:: b(:),m(:)
-        integer(prec):: md
-        integer(prec),allocatable:: x0(:), mmul(:)
-        integer(prec):: ret, i, j, g, gi, gj
-        integer(prec):: t
+        integer(int64),allocatable:: b(:),m(:)
+        integer(int64):: md
+        integer(int64),allocatable:: x0(:), mmul(:)
+        integer(int64):: ret, i, j, g, gi, gj
+        integer(int64):: t
 
-        do i=1_prec,size(b)
-            do j=1_prec, i-1_prec
+        do i=1_int64,size(b)
+            do j=1_int64, i-1_int64
                 g = gcd(m(i),m(j))
-                if (mod(b(i)-b(j), g) /= 0_prec) then
-                    ret = -1_prec
+                if (mod(b(i)-b(j), g) /= 0_int64) then
+                    ret = -1_int64
                     return
                 end if
                 m(i) = m(i) / g
@@ -145,10 +144,10 @@ contains
         end do
 
         m = [m,md]
-        allocate(x0(size(m)), source=0_prec)
-        allocate(mmul(size(m)), source=1_prec)
+        allocate(x0(size(m)), source=0_int64)
+        allocate(mmul(size(m)), source=1_int64)
 
-        do i=1_prec,size(b)
+        do i=1_int64,size(b)
             t = modulo((b(i)-x0(i)) * mod_inv(mmul(i), m(i)), m(i))
             do j=i+1,size(m)
                 x0(j) = modulo(x0(j) + t * mmul(j), m(j))
