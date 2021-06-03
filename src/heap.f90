@@ -3,10 +3,11 @@ module heap_int32_mod
     ! 最大値を素早く返したい場合
     !  1. 値の符号を変えてpush
     !  2. popやtopで取得した値は符号を元に戻すのを忘れずに。
+    use array_mod
     use,intrinsic :: iso_fortran_env
     private 
     type, public:: heap
-        integer(int32),private:: len
+        integer(int32):: len
         integer(int32),allocatable:: val(:)
     contains
         procedure:: size => h_size
@@ -66,8 +67,9 @@ contains
     subroutine h_push(h,val)
         class(heap),intent(inout):: h
         integer(int32),intent(in):: val
-        if (h%len+1 >= size(h%val)) call add(h)
+
         h%len=h%len+1
+        if (h%len >= size(h%val)) call append_array(h%val)
         h%val(h%len) = val
         call heap_up(h,h%len)
     end subroutine
@@ -90,24 +92,6 @@ contains
         print*, 'pop', val
         call heap_down(h,1_int32)
     end function
-
-
-    subroutine add(h)
-        class(heap),intent(inout):: h
-        call add_array(h%val)
-    end subroutine
-
-
-    subroutine add_array(ar)
-        integer(int32),allocatable,intent(inout):: ar(:)
-        integer(int32),allocatable:: tmp(:)
-        integer(int32):: l
-
-        l = size(ar)
-        allocate(tmp(1:2*l))
-        tmp(1:l) = ar(1:l)
-        call move_alloc(tmp, ar)
-    end subroutine
 
 
     subroutine heap_up(h,ind)

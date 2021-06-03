@@ -12,6 +12,7 @@ module fenwic_tree_int32_mod
     end type
 contains
     function lsb(x) result(ret)
+        ! x & -x => 立っている最下位ビットを返す
         integer(int32),intent(in):: x
         integer(int32):: ret
 
@@ -24,11 +25,16 @@ contains
         integer(int32):: bx,k
         integer(int32):: i,n
 
-        i=1; bx=x; n=fw%vec%l+1; k=lsb(n)
+        i=1
+        bx=x
+        n=fw%vec%l+1
+        k=lsb(n)
+
         do while(i /= k)
             bx=bx+fw%vec%array(n-i)
             i=i*2
         end do
+
         call fw%vec%push_back(bx)
     end subroutine
 
@@ -96,6 +102,7 @@ module fenwic_tree_int64_mod
     end type
 contains
     function lsb(x) result(ret)
+        ! x & -x => 立っている最下位ビットを返す
         integer(int32),intent(in):: x
         integer(int32):: ret
 
@@ -108,11 +115,16 @@ contains
         integer(int64):: bx,k
         integer(int32):: i,n
 
-        i=1; bx=x; n=fw%vec%l+1; k=lsb(n)
+        i=1
+        bx=x
+        n=fw%vec%l+1
+        k=lsb(n)
+
         do while(i /= k)
             bx=bx+fw%vec%array(n-i)
             i=i*2
         end do
+        
         call fw%vec%push_back(bx)
     end subroutine
 
@@ -180,6 +192,7 @@ module fenwic_tree_real64_mod
     end type
 contains
     function lsb(x) result(ret)
+        ! x & -x => 立っている最下位ビットを返す
         integer(int32),intent(in):: x
         integer(int32):: ret
 
@@ -192,11 +205,16 @@ contains
         real(real64):: bx,k
         integer(int32):: i,n
 
-        i=1; bx=x; n=fw%vec%l+1; k=lsb(n)
+        i=1
+        bx=x
+        n=fw%vec%l+1
+        k=lsb(n)
+
         do while(i /= k)
             bx=bx+fw%vec%array(n-i)
             i=i*2
         end do
+
         call fw%vec%push_back(bx)
     end subroutine
 
@@ -255,4 +273,9 @@ module fenwic_tree_mod
     use fenwic_tree_int32_mod, fenwic_int32 => fenwic
     use fenwic_tree_int64_mod, fenwic_int64 => fenwic
     use fenwic_tree_real64_mod, fenwic_real64 => fenwic
+    implicit none
+    private
+    public:: fenwic_int32
+    public:: fenwic_int64
+    public:: fenwic_real64
 end module

@@ -1,27 +1,47 @@
-program main
+module a_mod
     use,intrinsic :: iso_fortran_env
     implicit none
-    integer(int32),allocatable:: ar(:)
-    integer(int32):: nl,nr,l,r,i
+    type,abstract:: vec_base
+        integer(int32):: l=0
+    end type
+    type, public, extends(vec_base):: vec_int32
+        integer(int32):: l=0
+        integer(int32),allocatable:: ar(:)
+    contains
+        procedure:: pushback => push_back_int32
+    end type
 
-    read*, l,r
-    allocate(ar(l:r), source=[(i,i=l,r)])
-    print'(*(i0,1x))', lbound(ar,1),ubound(ar,1)
-    print'(*(i0,1x))', ar(l:r)
-    read*, nl,nr
-    call resize_array(ar,nl,nr,l,r)
-    print'(*(i0,1x))', lbound(ar,1),ubound(ar,1)
-    print'(*(i0,1x))', ar(nl:nr)
+    type, public:: vec_int64
+        integer(int32):: l=0
+        integer(int64),allocatable:: ar(:)
+    contains
+        procedure:: push_back
+    end type
+
+    interface
+        module subroutine push_back_int32(vec,x)
+            class(vec_base):: vec
+            integer(int32):: x
+            integer(int32):: l
+
+        end subroutine
+    end interface
+end module
+
+submodule(a_mod) a_submodule
 contains
-    subroutine resize_array(arr, nl, nr, dl, dr)
-        integer(int32),intent(inout),allocatable:: arr(:)
-        integer(int32),intent(in):: nl,nr ! 新しい配列の両端
-        integer(int32),intent(in):: dl,dr ! 引き継ぐデータの両端
-        integer(int32),allocatable:: tmp(:)
+    module procedure push_back_int32
+        l=l+1
+        vec%ar(l) = x
+    end procedure
+end submodule
 
-        allocate(tmp(nl:nr))
-        print'(*(i0,1x))', lbound(arr,1),ubound(arr,1)
-        tmp(dl:dr) = arr(dl:dr)
-        call move_alloc(tmp,arr)
-    end subroutine resize_array
+
+
+
+program main
+    use,intrinsic :: iso_fortran_env
+    use a_mod
+    implicit none
+    
 end program main
