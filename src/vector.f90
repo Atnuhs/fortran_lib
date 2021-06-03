@@ -1,5 +1,6 @@
 module vector_int32_mod
     use,intrinsic :: iso_fortran_env
+    use array_mod
     implicit none
     private
     type,public:: vector
@@ -10,41 +11,12 @@ module vector_int32_mod
         procedure:: pop_back=>vec_pop_back
     end type
 contains
-    pure subroutine vec_append_array(ar)
-        ! append array size to double
-        integer(int32), allocatable,intent(inout):: ar(:)
-        integer(int32):: l,r ! original array size
-        integer(int32),allocatable:: tmp(:)
-        
-        l = lbound(ar,1)
-        r = ubound(ar,1)
-        allocate(tmp(l:2*r))
-        tmp(l:r) = ar(l:r)
-        call move_alloc(tmp, ar)
-    end subroutine
-
-
-    pure subroutine vec_reduce_array(ar)
-        ! reduce array size to half
-        integer(int32), allocatable,intent(inout):: ar(:)
-        integer(int32):: l,r ! original array size
-        integer(int32),allocatable:: tmp(:)
-        
-        l = lbound(ar,1)
-        r = ubound(ar,1)
-        allocate(tmp(l:r/2))
-        tmp(l:r/2) = ar(l:r/2)
-        call move_alloc(tmp, ar)
-    end subroutine
-
-
     pure subroutine check_allocation_size(vec)
         type(vector),intent(inout):: vec
         integer(int32):: len_alloc
 
         len_alloc = size(vec%array)
-        if (vec%l >= len_alloc) call vec_append_array(vec%array)
-
+        if (vec%l >= len_alloc) call append_array(vec%array)
     end subroutine
 
 
@@ -71,6 +43,7 @@ end module
 
 module vector_int64_mod
     use,intrinsic :: iso_fortran_env
+    use array_mod
     implicit none
     private
     type,public:: vector
@@ -81,40 +54,12 @@ module vector_int64_mod
         procedure:: pop_back=>vec_pop_back
     end type
 contains
-    pure subroutine vec_append_array(ar)
-        ! append array size to double
-        integer(int64), allocatable,intent(inout):: ar(:)
-        integer(int32):: l,r ! original array size
-        integer(int64),allocatable:: tmp(:)
-        
-        l = lbound(ar,1)
-        r = ubound(ar,1)
-        allocate(tmp(l:2*r))
-        tmp(l:r) = ar(l:r)
-        call move_alloc(tmp, ar)
-    end subroutine
-
-
-    pure subroutine vec_reduce_array(ar)
-        ! reduce array size to half
-        integer(int64), allocatable,intent(inout):: ar(:)
-        integer(int32):: l,r ! original array size
-        integer(int64),allocatable:: tmp(:)
-        
-        l = lbound(ar,1)
-        r = ubound(ar,1)
-        allocate(tmp(l:r/2))
-        tmp(l:r/2) = ar(l:r/2)
-        call move_alloc(tmp, ar)
-    end subroutine
-
-
     pure subroutine check_allocation_size(vec)
         type(vector),intent(inout):: vec
         integer(int32):: len_alloc
 
         len_alloc = size(vec%array)
-        if (vec%l >= len_alloc) call vec_append_array(vec%array)
+        if (vec%l >= len_alloc) call append_array(vec%array)
 
     end subroutine
 
@@ -141,6 +86,7 @@ end module
 
 module vector_real64_mod
     use,intrinsic :: iso_fortran_env
+    use array_mod
     implicit none
     private
     type,public:: vector
@@ -156,7 +102,7 @@ contains
         integer(int32):: len_alloc
 
         len_alloc = size(vec%array)
-        if (vec%l >= len_alloc) call vec_append_array(vec%array)
+        if (vec%l >= len_alloc) call append_array(vec%array)
     end subroutine
 
 
