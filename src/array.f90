@@ -136,37 +136,37 @@ end module
 module array_mod
     use,intrinsic :: iso_fortran_env
     ! using int32 module
-    use array_int32_mod, append_array_int32 => append_array
-    use array_int32_mod, reduce_array_int32 => reduce_array
-    use array_int32_mod, resize_array_int32 => resize_array
+    use array_int32_mod, appendint32 => append_array
+    use array_int32_mod, reduceint32 => reduce_array
+    use array_int32_mod, resizeint32 => resize_array
     ! using int64 module
-    use array_int64_mod, append_array_int64 => append_array
-    use array_int64_mod, reduce_array_int64 => reduce_array
-    use array_int64_mod, resize_array_int64 => resize_array
+    use array_int64_mod, appendint64 => append_array
+    use array_int64_mod, reduceint64 => reduce_array
+    use array_int64_mod, resizeint64 => resize_array
     ! using real64 module
-    use array_real64_mod, append_array_real64 => append_array
-    use array_real64_mod, reduce_array_real64 => reduce_array
-    use array_real64_mod, resize_array_real64 => resize_array
+    use array_real64_mod, appendreal64 => append_array
+    use array_real64_mod, reducereal64 => reduce_array
+    use array_real64_mod, resizereal64 => resize_array
     implicit none
     private
-    public:: append_array
-    public:: reduce_array
-    public:: resize_array
     interface append_array
-        module procedure:: append_array_int32
-        module procedure:: append_array_int64
-        module procedure:: append_array_real64
+        module procedure:: appendint32
+        module procedure:: appendint64
+        module procedure:: appendreal64
     end interface
 
     interface reduce_array
-        module procedure:: reduce_array_int32
-        module procedure:: reduce_array_int64
-        module procedure:: reduce_array_real64
+        module procedure:: reduceint32
+        module procedure:: reduceint64
+        module procedure:: reducereal64
     end interface
 
     interface resize_array
-        module procedure:: resize_array_int32
-        module procedure:: resize_array_int64
-        module procedure:: resize_array_real64
+        module procedure:: resizeint32
+        module procedure:: resizeint64
+        module procedure:: resizereal64
     end interface
+    public:: append_array
+    public:: reduce_array
+    public:: resize_array
 end module

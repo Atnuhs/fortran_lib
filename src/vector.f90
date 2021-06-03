@@ -131,4 +131,10 @@ module vector_mod
     use vector_int32_mod, vector_int32 => vector
     use vector_int64_mod, vector_int64 => vector
     use vector_real64_mod, vector_real64 => vector
+    use,intrinsic :: iso_fortran_env
+    implicit none
+    private
+    public:: vector_int32
+    public:: vector_int64
+    public:: vector_real64
 end module
