@@ -9,7 +9,7 @@ module eratosthenes_sieve_mod
         integer(prec):: cnt
     end type
     integer(prec), allocatable:: sieve(:)
-    type(vector):: primes
+    type(vector_int32):: primes
 
 contains
     subroutine make_sieve(n)
@@ -35,7 +35,7 @@ contains
         ! xの素因数をvectorで返す。ex) x=24 -> vector[2,2,2,3]
         !　NEED => vector構造, sieve(初期化)
         integer(prec),value:: x
-        type(vector):: ret
+        type(vector_int32):: ret
 
         ! if(x==1) call ret%push_back(1_prec)
         do while(x/=1)
@@ -59,24 +59,24 @@ contains
 
         integer(prec),intent(in):: x
         integer(prec):: i,j
-        type(vector):: fv
+        type(vector_int32):: fv
         type(factor_pair),allocatable:: tmp(:), ret(:)
         fv = prime_factor_vec(x)
 
-        if (fv%size() == 0) then
+        if (fv%l == 0) then
             allocate(ret(0))
             return
         end if
 
-        allocate(tmp(fv%size()), source=factor_pair(0,0))
-        tmp(1)%val = fv%at(1_prec); tmp(1)%cnt = 1
+        allocate(tmp(fv%l), source=factor_pair(0,0))
+        tmp(1)%val = fv%array(1); tmp(1)%cnt = 1
         j=1
-        do i=2,fv%size()
-            if (fv%at(i) == fv%at(i-1)) then
+        do i=2,fv%l
+            if (fv%array(i) == fv%array(i-1)) then
                 tmp(j)%cnt = tmp(j)%cnt + 1
             else
                 j=j+1
-                tmp(j)%val = fv%at(i)
+                tmp(j)%val = fv%array(i)
                 tmp(j)%cnt = 1
             end if
         end do

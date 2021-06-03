@@ -4,7 +4,7 @@ module fenwic_tree_mod
     implicit none
     integer(int32),private,parameter:: prec = int32
     type,public:: fenwic
-        type(vector):: vec
+        type(vector_int32):: vec
     contains
         procedure:: push => fw_push
         procedure:: prefix_sum => fw_prefix_sum
@@ -18,22 +18,14 @@ contains
         ret = iand(x,-x)
     end function
 
-
-    function fw_size(fw) result(ret)
-        type(fenwic),intent(in):: fw
-        integer(prec):: ret
-        
-        ret = vec_size(fw%vec)
-    end function
-
     subroutine fw_push(fw,x)
         class(fenwic),intent(inout):: fw
         integer(prec),intent(in):: x
         integer(prec):: i,bx,k,n
 
-        i=1; bx=x; n=fw_size(fw)+1; k=lsb(n)
+        i=1; bx=x; n=fw%vec%l+1; k=lsb(n)
         do while(i /= k)
-            bx=bx+fw%vec%at(n-i)
+            bx=bx+fw%vec%array(n-i)
             i=i*2
         end do
         call fw%vec%push_back(bx)
@@ -47,7 +39,7 @@ contains
 
         ret=0; bi=i
         do while(bi>0)
-            ret=ret+fw%vec%at(bi)
+            ret=ret+fw%vec%array(bi)
             bi=bi-lsb(bi)
         end do
     end function
@@ -68,8 +60,8 @@ contains
         integer(prec):: bi
 
         bi = i
-        do while (bi <= fw_size(fw))
-            call fw%vec%update(bi, fw%vec%at(bi)+x)
+        do while (bi <= fw%vec%l)
+            fw%vec%array(bi) = fw%vec%array(bi)+x
             bi=bi+lsb(bi)
         end do
     end subroutine
@@ -90,6 +82,6 @@ contains
     subroutine fw_debug_print(fw)
         type(fenwic):: fw
 
-        print'(*(i0,1x))', vec_to_array(fw%vec)
+        print'(*(i0,1x))', fw%vec%array(:fw%vec%l)
     end subroutine
 end module

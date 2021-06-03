@@ -5,7 +5,7 @@ module vector_int32_mod
     private
     type,public:: vector
         integer(int32),allocatable:: array(:)
-        integer(int32),private:: l=0
+        integer(int32):: l=0
     contains
         procedure:: push_back=>vec_push_back
         procedure:: pop_back=>vec_pop_back
@@ -48,7 +48,7 @@ module vector_int64_mod
     private
     type,public:: vector
         integer(int64),allocatable:: array(:)
-        integer(int32),private:: l=0
+        integer(int32):: l=0
     contains
         procedure:: push_back=>vec_push_back
         procedure:: pop_back=>vec_pop_back
@@ -91,7 +91,7 @@ module vector_real64_mod
     private
     type,public:: vector
         real(real64),allocatable:: array(:)
-        integer(int32),private:: l=0
+        integer(int32):: l=0
     contains
         procedure:: push_back=>vec_push_back
         procedure:: pop_back=>vec_pop_back
