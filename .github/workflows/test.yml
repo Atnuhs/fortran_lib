@@ -22,7 +22,6 @@ jobs:
 
       - name: cmake-exec
         run: |
-          mkdir build && cd build
-          cmake ..
-          make
-          ./test/test_random/test_random.out
+          cmake -B build
+          cmake --build build
+          cmake --build build --target test
