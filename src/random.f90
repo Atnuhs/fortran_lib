@@ -75,4 +75,10 @@ module random_mod
     interface randint
         module procedure ri32, ri64
     end interface
+
+    interface random01
+        module procedure random01
+    end interface
+
+    public:: random01, randrange, randint
 end module
