@@ -49,7 +49,6 @@ module math_mod
     implicit none
 contains
     function mod_pow(base, exponent, m) result(ret)
-        use,intrinsic :: iso_fortran_env
         integer(int64),intent(in):: m
         integer(int64),value:: base, exponent
         integer(int64):: ret
