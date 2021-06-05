@@ -1,21 +1,14 @@
-module test_random_mod
+program test_random
     use,intrinsic :: iso_fortran_env
-    use,intrinsic:: iso_c_binding
     implicit none
-    private
-contains
-    function resultval(flg) result(ret)
-        integer(int32):: ret
-        logical,intent(in):: flg
 
-        ret = merge(0,1,flg)
-    end function
-    function test_random() result(ret) bind(c, name="test_random")
+    print'(a)', 'random_mod test'
+    call test_random_sub1
+contains
+    subroutine test_random_sub1()
         use random_mod
-        implicit none
         integer(int32):: n,i,imin,imax,amax,amin
         integer(int32), allocatable:: a(:)
-        integer(c_int):: ret
 
         n=10000
         imin=0
@@ -27,6 +20,7 @@ contains
             amax = max(amax, a(i))
             amin = min(amin, a(i))
         end do
-        ret = resultval(amax <= imax .and. amin >= imin)
-    end function
-end module
+        print'(*(i0,1x))', amax, amin
+        print'(*(i0,1x))', imin, imax
+    end subroutine
+end program test_random

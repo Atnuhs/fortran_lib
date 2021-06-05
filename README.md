@@ -15,3 +15,37 @@ FFTのライブラリに関しては、自己相関関数などのやや高級�
 ## 注意事項
 
 これらのライブラリはすべてFortran90以降の使用およびコーディングルールに準拠しています。moduleを用いてライブラリを作成しているため、Fortran77のコードに使用することはできません。使用者はFortran90以降の知識に明るく、moduleの使用方法を知っている必要があります。
+
+
+## 各`CMakeLists.txt`の役割
+
+準拠 : [FortranでCTestを用いる際の一つの実践例#実践例の背景知識](https://qiita.com/implicit_none/items/dc83695c301f107dbd6c#%E5%AE%9F%E8%B7%B5%E4%BE%8B%E3%81%AE%E8%83%8C%E6%99%AF%E7%9F%A5%E8%AD%98)
+
+このリポジトリには複数の`CMakeLists.txt`が存在します。
+
+1. プロジェクトルートに置いてある`CMakeLists.txt`
+2. testディレクトリの`CMakeLists.txt`
+3. testディレクトリ内の各モジュールテスト用ディレクトリ内の`CMakeLists.txt`
+4. src内の`CMakeLists.txt`
+
+### プロジェクトルートに置いてある`CMakeLists.txt`
+
+* プロジェクトの全体設定(CMakeのバージョン、プロジェクト名、Fortran有効化)
+* テストの全体設定(テスト有効化、サブディレクトリの登録)
+* .modファイルの出力先設定
+
+### testディレクトリの`CMakeLists.txt`
+
+* ビルドするテストを管理(サブディレクトリの登録)
+* テスト登録用マクロの設定
+
+### testディレクトリ内の各モジュールテスト用ディレクトリ内の`CMakeLists.txt`
+
+* テストのビルド
+* テストの登録
+
+### src内の`CMakeLists.txt`
+
+* テスト対象moduleのビルド
+* テスト対象moduleの登録
+* テスト対象moduleの.modファイルの登録
