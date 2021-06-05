@@ -64,7 +64,7 @@ end module
 
 module random_mod
     use,intrinsic :: iso_fortran_env
-    use random01_mod, only: rnd => random01
+    use random01_mod, only: random01
     use random32, rr32=>randrange, ri32=>randint
     use random64, rr64=>randrange, ri64=>randint
     
