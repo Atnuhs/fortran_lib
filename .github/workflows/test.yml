@@ -11,10 +11,10 @@ jobs:
           ls
           gfortran --version
 
-      - name: update-ubuntu
-        run: |
-          sudo apt update
-          sudo apt upgrade
+      # - name: update-ubuntu
+      #   run: |
+      #     sudo apt update
+      #     sudo apt upgrade
 
       - name: install-env
         run: |
