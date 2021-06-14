@@ -8,7 +8,7 @@ module a_mod
         integer(int32):: l=0
         integer(int32),allocatable:: ar(:)
     contains
-        procedure:: pushback => push_back_int32
+        procedure:: push_back
     end type
 
     type, public:: vec_int64
@@ -19,9 +19,16 @@ module a_mod
     end type
 
     interface
-        module subroutine push_back_int32(vec,x)
+        module subroutine push_back(vec,x)
             class(vec_base):: vec
             integer(int32):: x
+            integer(int32):: l
+
+        end subroutine
+
+        module subroutine push_back(vec,x)
+            class(vec_base):: vec
+            integer(int64):: x
             integer(int32):: l
 
         end subroutine
