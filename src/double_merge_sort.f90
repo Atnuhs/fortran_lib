@@ -155,8 +155,10 @@ module double_merge_sort_char
     implicit none
 contains
     subroutine double_merge_sort(ar1, ar2)
-        character(*),intent(inout):: ar1(:), ar2(:)
-        character(:),allocatable:: tmp1(:), tmp2(:)
+        character(*),intent(inout):: ar1(:)
+        integer(int32),intent(inout):: ar2(:)
+        character(:),allocatable:: tmp1(:)
+        integer(int32),allocatable:: tmp2(:)
         integer(int32):: i, n, d, hd
 
         allocate(tmp1, mold=ar1)
@@ -164,8 +166,8 @@ contains
         n = size(ar1)
         do i=1,n-1,2
             if (ar1(i+1) < ar1(i))then 
-                call swap(ar1(i), ar1(i+1))
-                call swap(ar2(i), ar2(i+1))
+                call swap_char(ar1(i), ar1(i+1))
+                call swap_int(ar2(i), ar2(i+1))
             end if
         end do
         hd=2
@@ -185,7 +187,8 @@ contains
 
 
     subroutine merge_sub(ar1, ar2, tmp1, tmp2, n1, i2, n2)
-        character(*),intent(inout):: ar1(:), tmp1(:), ar2(:), tmp2(:)
+        character(*),intent(inout):: ar1(:), tmp1(:)
+        integer(int32),intent(inout):: ar2(:), tmp2(:)
         integer(int32),value:: n1, i2, n2
         integer(int32):: i,i1
         
@@ -214,9 +217,20 @@ contains
     end subroutine
 
 
-    subroutine swap(x, y)
+    subroutine swap_char(x, y)
         character(*),intent(inout):: x, y
         character(:),allocatable:: t1, t2
+
+            t1 = x
+            t2 = y
+            x = t2
+            y = t1
+    end subroutine
+
+
+    subroutine swap_int(x, y)
+        integer(int32),intent(inout):: x, y
+        integer(int32):: t1, t2
 
             t1 = x
             t2 = y
