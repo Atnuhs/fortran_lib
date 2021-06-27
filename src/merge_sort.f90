@@ -140,7 +140,7 @@ contains
         integer(int32):: i,n,d,hd
 
         n = size(ar)
-        allocate(tmp, source=ar)
+        allocate(tmp, mold=ar)
         do i=1,n-1,2
             if (ar(i+1) < ar(i)) call swap(ar(i), ar(i+1))
         end do
