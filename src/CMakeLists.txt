@@ -14,3 +14,4 @@ endmacro(ADDLIB)
 ###　moduleの登録
 ADDLIB(random)
 ADDLIB(array)
+ADDLIB(splay_node)

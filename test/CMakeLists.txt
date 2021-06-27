@@ -29,3 +29,4 @@ endmacro(ADDTEST)
 ### テストディレクトリの追加
 add_subdirectory(test_random)
 add_subdirectory(test_array)
+add_subdirectory(test_splay_node)
