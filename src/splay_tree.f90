@@ -1,13 +1,12 @@
 module splay_node_mod
     use,intrinsic :: iso_fortran_env
     implicit none
-    integer(int32),parameter:: prec=int64
     type:: splay_node
         type(splay_node),pointer:: left => null()
         type(splay_node),pointer:: right => null()
         type(splay_node),pointer:: parent => null()
         integer(int32):: size = 1
-        integer(prec):: value, minimum
+        integer(int32):: value, minimum
     contains
         procedure:: state => sn_state
         procedure:: rotate => sn_rotate
@@ -130,12 +129,16 @@ contains
             sn%minimum = min(sn%minimum, sn%right%minimum)
         end if
     end subroutine
+end module
 
 
-    function sn_get_node(sn, ind) result(ret_node)
-        class(splay_node),intent(in):: sn
-        type(splay_node):: now, ret_node
-        integer(prec),value:: ind
+module splay_tree_mod
+    use,intrinsic :: iso_fortran_env
+    use splay_node_mod
+contains
+    function st_get_node(sn, ind) result(ret_node)
+        type(splay_node),pointer:: sn, now, ret_node
+        integer(int32),value:: ind
         integer(int32):: now_ind
 
         now = sn
@@ -163,31 +166,45 @@ contains
     end function
 
 
-    subroutine sn_merge(lroot, rroot)
-        class(splay_node):: lroot
-        type(splay_node):: rroot
-        ! 左のノードに右のノードをくっつける
+    subroutine st_merge(lroot, rroot)
+        type(splay_node),pointer:: lroot, rroot
+        ! lrootにrrootをくっつける
+
+        if (.not. associated(lroot))then
+            lroot = rroot
+            return
+        end if
+        if (.not. associated(rroot))then
+            lroot = lroot
+            return
+        end if
+
+        ! lrootの右端をget
+        lroot = st_get_node(lroot, lroot%size)
+        ! rrootをlrootの右の子にする
+        lroot%right = rroot
+        rroot%parent = lroot
+        call lroot%size_update()
+    end subroutine
+
+
+    subroutine st_split(sn, left_cnt, lroot, rroot)
+        type(splay_node), pointer:: sn, lroot, rroot
+        integer(int32), intent(in):: left_cnt
+
 
 
     end subroutine
 
 
-    subroutine sn_split(sn, left_cnt, lroot, rroot)
-        class(splay_node):: sn
-        type(splay_node),intent(out):: lroot, rroot
-        integer(int32),intent(in):: left_cnt
-
-    end subroutine
-
-
-    subroutine sn_insert(sn, ind, node)
+    subroutine st_insert(sn, ind, node)
         class(splay_node):: sn, node
         integer(int32),intent(in):: ind
 
     end subroutine
 
 
-    subroutine sn_delete(sn, ind)
+    subroutine st_delete(sn, ind)
         class(splay_node):: sn
         integer(int32),intent(in):: ind
 end subroutine
