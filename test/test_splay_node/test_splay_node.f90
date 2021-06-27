@@ -22,13 +22,13 @@ contains
             call sn_size_update(node(i+1))
         end do
         root => node(n+1)
-        call debug_print(root, 1, '')
+        ! call debug_print(root, 1, '')
         do i=1,10
             v = randrange(1,n)
-            print*, repeat("=",20), i,v, repeat("=",20)
+            ! print*, repeat("=",20), i,v, repeat("=",20)
             call sn_rooting(root, v)
             root%value = i
-            call debug_print(root, 1, '')
+            ! call debug_print(root, 1, '')
         end do
     end function
 
