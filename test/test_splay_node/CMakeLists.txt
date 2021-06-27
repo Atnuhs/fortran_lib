@@ -1,1 +1,1 @@
-ADDTEST(splay_node)
+ADDTEST(splay_node random_mod)

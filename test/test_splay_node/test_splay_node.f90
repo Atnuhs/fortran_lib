@@ -1,6 +1,7 @@
 program test_splay_node
     use,intrinsic :: iso_fortran_env
     use splay_node_mod
+    use random_mod
     implicit none
 
     print'(a)', '### splay_node test'
@@ -8,19 +9,27 @@ program test_splay_node
 
 contains
     function test_rooting() result(ret)
-        type(splay_node),pointer:: root
-        integer(int32):: n,i
+        type(splay_node),pointer:: node(:), root
+        integer(int32):: n,i,v
         logical:: ret
         ret = .true.
-        root => null()
-        n = 100
-        do i=1,n
-            print'(i0)', i
-            call sn_rooting(root,i)
-            root%value=i
-        end do
 
+        n = 10
+        allocate(node(10000))
+        do i=1,n
+            node(i)%parent => node(i+1)
+            node(i+1)%left => node(i)
+            call sn_size_update(node(i+1))
+        end do
+        root => node(n+1)
         call debug_print(root, 1, '')
+        do i=1,10
+            v = randrange(1,n)
+            print*, repeat("=",20), i,v, repeat("=",20)
+            call sn_rooting(root, v)
+            root%value = i
+            call debug_print(root, 1, '')
+        end do
     end function
 
     recursive subroutine debug_print(now, ind, clr)
@@ -40,7 +49,7 @@ contains
     else if (clr == "l") then
         write(*,'(a)',advance="no") "└ "
     else
-        write(*,'(a)',advance="no") "  "
+        write(*,'(a)',advance="no") "*"
     end if
     print'("[ ",2(i0,1x),"]")', now%value, now%size
     call debug_print(now%left,ind+1,"l")

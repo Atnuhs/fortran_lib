@@ -12,7 +12,7 @@ macro(ADDTEST name)
     add_executable(test_${name} test_${name}.f90)
 
     ### 参照するmodファイルのディレクトリとリンクするライブラリの設定
-    target_link_libraries(test_${name} ${name}_mod)
+    target_link_libraries(test_${name} ${name}_mod ${ARGN})
     set_target_properties(test_${name}
         PROPERTIES
         Fortran_MODULE_DIRECTORY ${LIB_MOD_DIR}
