@@ -23,7 +23,7 @@ contains
             end do
             i = ((n+d-1)/d-1)*d+1
             if (i+hd <= n) then
-                call merge_sub(ar1(i:), ar2(i:i+d-1), tmp1, tmp2, hd, hd+1, n-i+1) 
+                call merge_sub(ar1(i:), ar2(i:), tmp1, tmp2, hd, hd+1, n-i+1) 
             end if
             hd=d
             d=d*2
@@ -99,7 +99,7 @@ contains
             end do
             i = ((n+d-1)/d-1)*d+1
             if (i+hd <= n) then
-                call merge_sub(ar1(i:), ar2(i:i+d-1), tmp1, tmp2, hd, hd+1, n-i+1) 
+                call merge_sub(ar1(i:), ar2(i:), tmp1, tmp2, hd, hd+1, n-i+1) 
             end if
             hd=d
             d=d*2
@@ -178,7 +178,7 @@ contains
             end do
             i = ((n+d-1)/d-1)*d+1
             if (i+hd <= n) then
-                call merge_sub(ar1(i:), ar2(i:i+d-1), tmp1, tmp2, hd, hd+1, n-i+1) 
+                call merge_sub(ar1(i:), ar2(i:), tmp1, tmp2, hd, hd+1, n-i+1) 
             end if
             hd=d
             d=d*2
