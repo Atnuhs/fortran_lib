@@ -26,7 +26,7 @@ contains
         type(splay_node),pointer:: sn
         type(splay_node),pointer:: pp, p, c
 
-        ! 登場人物:: 自分(sn), 親(p), 親親(pp), 子供(c)
+        ! 登場人物:: 自分(sn), 子供(c), 親(p), 親親(pp)
         ! 自分と親の存在は確定。親親の存在は未定
 
         ! 自分=子供の片方, 自分=親, 親=親親 それぞれ双方向
