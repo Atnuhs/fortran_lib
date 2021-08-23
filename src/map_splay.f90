@@ -263,8 +263,7 @@ contains
         if (associated(rroot)) rroot%parent => null()
         deallocate(node)
         
-        ! merge
-
+        ! lrootの子にrrootをmerge
         if (.not. associated(lroot))then
             lroot => rroot
         else if (.not. associated(rroot))then
