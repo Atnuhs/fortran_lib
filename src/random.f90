@@ -16,7 +16,7 @@ contains
 end module
 
 
-module random32
+module random_int32
     use,intrinsic :: iso_fortran_env
     use random01_mod,only: rnd => random01
     implicit none
@@ -39,7 +39,7 @@ contains
 end module
 
 
-module random64
+module random_int64
     use,intrinsic :: iso_fortran_env
     use random01_mod,only: rnd => random01
     implicit none
@@ -62,18 +62,42 @@ contains
 end module
 
 
+module random_real64
+    use,intrinsic :: iso_fortran_env
+    use random01_mod,only: rnd => random01
+    implicit none
+    private
+    public:: randrange, randint
+contains
+    function randrange(l,r) result(v)
+        real(real64),intent(in):: l,r
+        real(real64):: v
+
+        v = rnd()*(r-l) + l
+    end function
+
+    function randint(n) result(v)
+        real(real64),intent(in):: n
+        real(real64):: v
+
+        v = rnd()*n
+    end function
+end module random_real64
+
+
 module random_mod
     use,intrinsic :: iso_fortran_env
     use random01_mod, only: random01
-    use random32, rr32=>randrange, ri32=>randint
-    use random64, rr64=>randrange, ri64=>randint
+    use random_int32, rri32=>randrange, rii32=>randint
+    use random_int64, rri64=>randrange, rii64=>randint
+    use random_real64, rrr64=>randrange, rir64=>randint
     
     interface randrange
-        module procedure rr32, rr64
+        module procedure rri32, rri64, rrr64
     end interface
 
     interface randint
-        module procedure ri32, ri64
+        module procedure rii32, rii64, rir64
     end interface
 
     interface random01
