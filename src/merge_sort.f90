@@ -6,59 +6,57 @@ module merge_sort_int32
 contains
     subroutine merge_sort(ar)
         integer(int32),intent(inout):: ar(:)
-        integer(int32):: i,n,d,hd,tmp(size(ar))
+        integer(int32):: tmp(size(ar))
 
-        n = size(ar)
-        do i=1,n-1,2
-            if (ar(i+1) < ar(i)) call swap(ar(i), ar(i+1))
-        end do
-        hd=2
-        d=4
-        do while(hd < n)
-            do i=1,n-d,d
-                call merge_sub(ar(i:i+d-1), tmp, hd, hd+1, d)
-            end do
-            i = ((n+d-1)/d-1)*d+1
-            if (i+hd <= n) then
-                call merge_sub(ar(i:), tmp, hd, hd+1, n-i+1) 
-            end if
-            hd=d
-            d=d*2
-        end do
+        call merge_sort_sub(1_int32, size(ar,kind=int32), ar, tmp)
     end subroutine
 
-
-    subroutine merge_sub(ar, tmp, n1, i2, n2)
+    recursive subroutine merge_sort_sub(l, r, ar, tmp)
+        integer(int32),intent(in):: l, r
         integer(int32),intent(inout):: ar(:), tmp(:)
-        integer(int32),value:: n1, i2, n2
-        integer(int32):: i,i1
-        
-        i1=1
-        tmp(i1:n1) = ar(i1:n1)
-        do i=1,n2
-            if (n1 < i1) then
-                return
-            else if (n2 < i2) then
-                ar(i:)=tmp(i1:n1)
-                return
-            else
-                if (ar(i2) <= tmp(i1)) then
-                    ar(i) = ar(i2); i2=i2+1
-                else
-                    ar(i) = tmp(i1); i1=i1+1
-                end if
+        integer(int32):: m
+
+        if (r-l <= 1) then
+            if (ar(l) > ar(r)) then
+                m = ar(l)
+                ar(l) = ar(r)
+                ar(r) = m
             end if
-        end do
+        else
+            m = (l+r) / 2
+            call merge_sort_sub(l, m ,ar, tmp)
+            call merge_sort_sub(m+1, r, ar, tmp)
+            call merge_sub(l, m, r, ar, tmp)
+        end if
     end subroutine
 
-    subroutine swap(x, y)
-        integer(int32),intent(inout):: x, y
-        integer(int32):: t1, t2
+    subroutine merge_sub(l, n1, n2, ar, tmp)
+        integer(int32), intent(in):: l, n1, n2
+        integer(int32), intent(inout):: ar(:), tmp(:)
+        integer(int32):: i1, i2, it, nt
 
-            t1 = x
-            t2 = y
-            x = t2
-            y = t1
+        i1 = l
+        i2 = n1+1
+        it = 1
+        nt = n2-l+1
+
+        do while(i1 <= n1 .and. i2 <= n2)
+            if (ar(i1) <= ar(i2)) then
+                tmp(it) = ar(i1)
+                i1=i1+1
+            else
+                tmp(it) = ar(i2)
+                i2=i2+1
+            end if
+            it=it+1
+        end do
+
+        if (i1 <= n1) then
+            tmp(it:nt) = ar(i1:n1)
+        else if (i2 <= n2) then
+            tmp(it:nt) = ar(i2:n2)
+        end if
+        ar(l:n2) = tmp(1:nt)
     end subroutine
 end module
 
@@ -71,59 +69,57 @@ module merge_sort_int64
 contains
     subroutine merge_sort(ar)
         integer(int64),intent(inout):: ar(:)
-        integer(int64):: i,n,d,hd,tmp(size(ar))
+        integer(int64):: tmp(size(ar))
 
-        n = size(ar)
-        do i=1,n-1,2
-            if (ar(i+1) < ar(i)) call swap(ar(i), ar(i+1))
-        end do
-        hd=2
-        d=4
-        do while(hd < n)
-            do i=1,n-d,d
-                call merge_sub(ar(i:i+d-1), tmp, hd, hd+1, d)
-            end do
-            i = ((n+d-1)/d-1)*d+1
-            if (i+hd <= n) then
-                call merge_sub(ar(i:), tmp, hd, hd+1, n-i+1) 
-            end if
-            hd=d
-            d=d*2
-        end do
+        call merge_sort_sub(1_int64, size(ar,kind=int64), ar, tmp)
     end subroutine
 
-
-    subroutine merge_sub(ar, tmp, n1, i2, n2)
+    recursive subroutine merge_sort_sub(l, r, ar, tmp)
+        integer(int64),intent(in):: l, r
         integer(int64),intent(inout):: ar(:), tmp(:)
-        integer(int64),value:: n1, i2, n2
-        integer(int64):: i,i1
-        
-        i1=1
-        tmp(i1:n1) = ar(i1:n1)
-        do i=1,n2
-            if (n1 < i1) then
-                return
-            else if (n2 < i2) then
-                ar(i:)=tmp(i1:n1)
-                return
-            else
-                if (ar(i2) <= tmp(i1)) then
-                    ar(i) = ar(i2); i2=i2+1
-                else
-                    ar(i) = tmp(i1); i1=i1+1
-                end if
+        integer(int64):: m
+
+        if (r-l <= 1) then
+            if (ar(l) > ar(r)) then
+                m = ar(l)
+                ar(l) = ar(r)
+                ar(r) = m
             end if
-        end do
+        else
+            m = (l+r) / 2
+            call merge_sort_sub(l, m ,ar, tmp)
+            call merge_sort_sub(m+1, r, ar, tmp)
+            call merge_sub(l, m, r, ar, tmp)
+        end if
     end subroutine
 
-    subroutine swap(x, y)
-        integer(int64),intent(inout):: x, y
-        integer(int64):: t1, t2
+    subroutine merge_sub(l, n1, n2, ar, tmp)
+        integer(int64), intent(in):: l, n1, n2
+        integer(int64), intent(inout):: ar(:), tmp(:)
+        integer(int64):: i1, i2, it, nt
 
-            t1 = x
-            t2 = y
-            x = t2
-            y = t1
+        i1 = l
+        i2 = n1+1
+        it = 1
+        nt = n2-l+1
+
+        do while(i1 <= n1 .and. i2 <= n2)
+            if (ar(i1) <= ar(i2)) then
+                tmp(it) = ar(i1)
+                i1=i1+1
+            else
+                tmp(it) = ar(i2)
+                i2=i2+1
+            end if
+            it=it+1
+        end do
+
+        if (i1 <= n1) then
+            tmp(it:nt) = ar(i1:n1)
+        else if (i2 <= n2) then
+            tmp(it:nt) = ar(i2:n2)
+        end if
+        ar(l:n2) = tmp(1:nt)
     end subroutine
 end module
 
@@ -136,63 +132,58 @@ module merge_sort_char
 contains
     subroutine merge_sort(ar)
         character(*),intent(inout):: ar(:)
-        character(:),allocatable:: tmp(:)
-        integer(int32):: i,n,d,hd
+        character(len(ar(1))):: tmp(size(ar))
 
-        n = size(ar)
-        allocate(tmp, mold=ar)
-        do i=1,n-1,2
-            if (ar(i+1) < ar(i)) call swap(ar(i), ar(i+1))
-        end do
-        hd=2
-        d=4
-        do while(hd < n)
-            do i=1,n-d,d
-                call merge_sub(ar(i:i+d-1), tmp, hd, hd+1, d)
-            end do
-            i = ((n+d-1)/d-1)*d+1
-            if (i+hd <= n) then
-                call merge_sub(ar(i:), tmp, hd, hd+1, n-i+1) 
-            end if
-            hd=d
-            d=d*2
-        end do
+        call merge_sort_sub(1_int32, size(ar,kind=int32), ar, tmp)
     end subroutine
 
-
-    subroutine merge_sub(ar, tmp, n1, i2, n2)
+    recursive subroutine merge_sort_sub(l, r, ar, tmp)
+        integer(int32),intent(in):: l, r
         character(*),intent(inout):: ar(:), tmp(:)
-        integer(int32),value:: n1, i2, n2
-        integer(int32):: i,i1
-        
-        i1=1
-        tmp(i1:n1) = ar(i1:n1)
-        do i=1,n2
-            if (n1 < i1) then
-                return
-            else if (n2 < i2) then
-                ar(i:)=tmp(i1:n1)
-                return
-            else
-                if (ar(i2) <= tmp(i1)) then
-                    ar(i) = ar(i2); i2=i2+1
-                else
-                    ar(i) = tmp(i1); i1=i1+1
-                end if
+        integer(int32):: m
+        character(len(ar(1))):: c
+
+        if (r-l <= 1) then
+            if (ar(l) > ar(r)) then
+                c = ar(l)
+                ar(l) = ar(r)
+                ar(r) = c
             end if
-        end do
+        else
+            m = (l+r) / 2
+            call merge_sort_sub(l, m ,ar, tmp)
+            call merge_sort_sub(m+1, r, ar, tmp)
+            call merge_sub(l, m, r, ar, tmp)
+        end if
     end subroutine
 
-    subroutine swap(x, y)
-        character(*),intent(inout):: x, y
-        character(:),allocatable:: t1, t2
+    subroutine merge_sub(l, n1, n2, ar, tmp)
+        integer(int32), intent(in):: l, n1, n2
+        character(*), intent(inout):: ar(:), tmp(:)
+        integer(int32):: i1, i2, it, nt
 
-        allocate(t1, mold=x)
-        allocate(t2, mold=y)
-        t1 = x
-        t2 = y
-        x = t2
-        y = t1
+        i1 = l
+        i2 = n1+1
+        it = 1
+        nt = n2-l+1
+
+        do while(i1 <= n1 .and. i2 <= n2)
+            if (ar(i1) <= ar(i2)) then
+                tmp(it) = ar(i1)
+                i1=i1+1
+            else
+                tmp(it) = ar(i2)
+                i2=i2+1
+            end if
+            it=it+1
+        end do
+
+        if (i1 <= n1) then
+            tmp(it:nt) = ar(i1:n1)
+        else if (i2 <= n2) then
+            tmp(it:nt) = ar(i2:n2)
+        end if
+        ar(l:n2) = tmp(1:nt)
     end subroutine
 end module
 
