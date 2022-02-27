@@ -25,7 +25,7 @@ contains
         end if
     end function
 
-  
+
     subroutine ssn_rotate(node)
         type(splay_set_node),pointer:: node
         type(splay_set_node),pointer:: pp, p, c
@@ -53,7 +53,7 @@ contains
             if (associated(pp%left, p)) pp%left => node
             if (associated(pp%right, p)) pp%right => node
         end if
-        
+
         node%parent => pp
         p%parent => node
         if (associated(c)) c%parent => p
@@ -183,8 +183,8 @@ contains
             end if
         end do
     end subroutine
-    
-    
+
+
     subroutine ssn_gt(root, val)
         type(splay_set_node),pointer:: root
         type(splay_set_node),pointer:: now
@@ -216,7 +216,7 @@ contains
     subroutine ssn_lt(root, val)
         type(splay_set_node),pointer:: root
         integer(int64)::val
-        
+
         if (.not. associated(root)) return
         call ssn_le(root, val-1)
     end subroutine
@@ -247,7 +247,7 @@ contains
             rroot => null()
             return
         end if
-        
+
         ! min <= val <= max
         rroot => null()
         call ssn_le(root, val)
@@ -261,7 +261,7 @@ contains
 
     subroutine ssn_merge(root, rroot)
         type(splay_set_node),pointer:: root, rroot
-        
+
         ! 例外処理
         if (.not. associated(rroot)) return
         if (.not. associated(root)) then
@@ -277,7 +277,7 @@ contains
         call ssn_update_data(root)
         rroot => null()
     end subroutine
-    
+
 
     subroutine ssn_insert(root, val)
         type(splay_set_node),pointer:: root, rroot, new_node
@@ -311,7 +311,7 @@ contains
 
         call ssn_le(root, val)
         if (val /= root%value) return
-       
+
         lroot => root%left
         rroot => root%right
         if (associated(lroot)) lroot%parent => null()
@@ -336,12 +336,12 @@ contains
         if (associated(root%left)) id_root = id_root + root%left%size
 
         if (id_root /= id) return
-        
+
         lroot => root%left
         rroot => root%right
         if (associated(lroot)) lroot%parent => null()
         if (associated(rroot)) rroot%parent => null()
-        
+
         deallocate(root)
         call ssn_merge(lroot, rroot)
         root => lroot
@@ -356,7 +356,7 @@ contains
         character(10):: line
         type(splay_set_node),pointer:: node
         integer(int64), intent(in):: indent, lr
-        
+
         if (lr==0) then
             line = "' ', "
         else if (lr == 1) then
@@ -364,7 +364,7 @@ contains
         else if (lr == -1) then
             line = "'└', "
         end if
-        
+
         fmt = "'[ val: ', i0, ' |size: ', i0, ' |min: ', i0, ' |max: ', i0, ' ]')"
         write(header, "('(', a, a)") "'" // repeat(' ',indent) // "'," ,trim(line)
         ! print'(a)', trim(header)//trim(fmt)
@@ -375,7 +375,7 @@ contains
     recursive subroutine ssn_print_tree(node, indent, lr)
         type(splay_set_node),pointer:: node
         integer(int64),intent(in):: indent, lr
-        
+
         if (.not. associated(node)) return
         call ssn_print_tree(node%left, indent+1, 1_int64)
         call ssn_print_node(node, indent, lr)
@@ -414,15 +414,15 @@ contains
 
         call ssn_insert(ss%root, val)
     end subroutine
-    
+
     subroutine sn_delete(ss, val)
         class(splay_set):: ss
         integer(int64):: val
-        
+
         call ssn_delete(ss%root, val)
     end subroutine
-    
-    
+
+
     subroutine sn_delete_at(ss, val)
         class(splay_set):: ss
         integer(int64):: val
@@ -466,7 +466,7 @@ contains
         if (associated(ss%root%left)) ret = ret + ss%root%left%size
     end function
 
-    
+
     function sn_lt(ss, val, val_error) result(ret)
         class(splay_set):: ss
         integer(int64),intent(in):: val
@@ -501,6 +501,7 @@ contains
         if (associated(ss%root%left)) ret = ret + ss%root%left%size
     end function
 
+
     function sn_gt(ss, val, val_error) result(ret)
         class(splay_set):: ss
         integer(int64),intent(in):: val
@@ -530,7 +531,7 @@ contains
         call ssn_le(ss%root, val)
         ret = val == ss%root%value
     end function
-    
+
 
     function sn_maxval(ss, val_error) result(val)
         class(splay_set):: ss
@@ -576,29 +577,7 @@ contains
 
     subroutine sn_print(ss)
         class(splay_set):: ss
-        
+
         call ssn_print_tree(ss%root, 0_int64, 0_int64)
     end subroutine 
 end module
-
-
-
-program main
-    use,intrinsic :: iso_fortran_env
-    use splay_set_mod
-    implicit none
-    integer(int64):: n, k, i, j
-    integer(int64), allocatable:: a(:),b(:)
-    type(splay_set):: ss
-
-    read*, n,k
-    allocate(a(n),b(n))
-    read*, (a(i),b(i), i=1,n)
-    do i=1,n
-        do j=1,b(i)
-            call ss%insert(a(i))
-        end do
-    end do
-
-    print'(i0)', 
-end program main
