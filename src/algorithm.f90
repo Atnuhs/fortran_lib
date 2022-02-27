@@ -80,7 +80,7 @@ contains
         integer(int64),intent(in):: a,b
         integer(int64):: ret
 
-        ret = a*b/gcd(a,b)
+        ret = a/gcd(a,b)*b
     end function
 
 
