@@ -17,7 +17,7 @@ contains
         integer(int64):: ssn_state
         ! root => 0
         ! 自身が親の左の子 => 1
-        ! 自身が親の右の子 => -1
+        ! ! ! ! ! 自身が親の右の子 => -1
         ssn_state=0
         if (associated(node%parent)) then
             if (associated(node%parent%left, node)) ssn_state=1
@@ -414,6 +414,7 @@ contains
 
         call ssn_insert(ss%root, val)
     end subroutine
+
 
     subroutine sn_delete(ss, val)
         class(splay_set):: ss
