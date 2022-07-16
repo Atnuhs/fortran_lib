@@ -1,252 +1,229 @@
 module double_merge_sort_int32
     use,intrinsic :: iso_fortran_env
     implicit none
-    
+    private
+    public:: merge_sort
 contains
-    subroutine double_merge_sort(ar1, ar2)
-        integer(int32),intent(inout):: ar1(:), ar2(:)
-        integer(int32):: tmp1(size(ar1)),tmp2(size(ar2))
-        integer(int32):: i, n, d, hd
+    subroutine merge_sort(ar, id)
+        integer(int32),intent(inout):: ar(:), id(:)
+        integer(int32):: tmp(size(ar)), idtmp(size(id))
 
-        n = size(ar1)
-        do i=1,n-1,2
-            if (ar1(i+1) < ar1(i))then 
-                call swap(ar1(i), ar1(i+1))
-                call swap(ar2(i), ar2(i+1))
-            end if
-        end do
-        hd=2
-        d=4
-        do while(hd < n)
-            do i=1,n-d,d
-                call merge_sub(ar1(i:i+d-1), ar2(i:i+d-1), tmp1, tmp2, hd, hd+1, d)
-            end do
-            i = ((n+d-1)/d-1)*d+1
-            if (i+hd <= n) then
-                call merge_sub(ar1(i:), ar2(i:), tmp1, tmp2, hd, hd+1, n-i+1) 
-            end if
-            hd=d
-            d=d*2
-        end do
+        call merge_sort_sub(1_int32, size(ar,kind=int32), ar, tmp, id, idtmp)
     end subroutine
 
+    recursive subroutine merge_sort_sub(l, r, ar, tmp, id, idtmp)
+        integer(int32),intent(in):: l, r
+        integer(int32),intent(inout):: ar(:), tmp(:), id(:), idtmp(:)
+        integer(int32):: m
 
-    subroutine merge_sub(ar1, ar2, tmp1, tmp2, n1, i2, n2)
-        integer(int32),intent(inout):: ar1(:), tmp1(:), ar2(:), tmp2(:)
-        integer(int32),value:: n1, i2, n2
-        integer(int32):: i,i1
-        
-        i1=1
-        tmp1(i1:n1) = ar1(i1:n1)
-        tmp2(i1:n1) = ar2(i1:n1)
-        do i=1,n2
-            if (n1 < i1) then
-                return
-            else if (n2 < i2) then
-                ar1(i:)=tmp1(i1:n1)
-                ar2(i:)=tmp2(i1:n1)
-                return
+        if (r-l <= 1) then
+            if (ar(l) > ar(r)) then
+                m = ar(l)
+                ar(l) = ar(r)
+                ar(r) = m
+                m = id(l)
+                id(l) = id(r)
+                id(r) = m
+            end if
+        else
+            m = (l+r) / 2
+            call merge_sort_sub(l, m ,ar, tmp, id, idtmp)
+            call merge_sort_sub(m+1, r, ar, tmp, id, idtmp)
+            call merge_sub(l, m, r, ar, tmp, id, idtmp)
+        end if
+    end subroutine
+
+    subroutine merge_sub(l, n1, n2, ar, tmp, id, idtmp)
+        integer(int32), intent(in):: l, n1, n2
+        integer(int32), intent(inout):: ar(:), tmp(:), id(:), idtmp(:)
+        integer(int32):: i1, i2, it, nt
+
+        i1 = l
+        i2 = n1+1
+        it = 1
+        nt = n2-l+1
+
+        do while(i1 <= n1 .and. i2 <= n2)
+            if (ar(i1) <= ar(i2)) then
+                tmp(it) = ar(i1)
+                idtmp(it) = id(i1)
+                i1=i1+1
             else
-                if (ar1(i2) <= tmp1(i1)) then
-                    ar1(i) = ar1(i2)
-                    ar2(i) = ar2(i2)
-                    i2=i2+1
-                else
-                    ar1(i) = tmp1(i1)
-                    ar2(i) = tmp2(i1)
-                    i1=i1+1
-                end if
+                tmp(it) = ar(i2)
+                idtmp(it) = id(i1)
+                i2=i2+1
             end if
+            it=it+1
         end do
+
+        if (i1 <= n1) then
+            tmp(it:nt) = ar(i1:n1)
+            idtmp(it:nt) = id(i1:n1)
+        else if (i2 <= n2) then
+            tmp(it:nt) = ar(i2:n2)
+            idtmp(it:nt) = id(i2:n2)
+        end if
+        ar(l:n2) = tmp(1:nt)
+        id(l:n2) = idtmp(1:nt)
     end subroutine
-
-
-    subroutine swap(x, y)
-        integer(int32),intent(inout):: x, y
-        integer(int32):: t1, t2
-
-            t1 = x
-            t2 = y
-            x = t2
-            y = t1
-    end subroutine
-end module double_merge_sort_int32
+end module
 
 
 
 module double_merge_sort_int64
     use,intrinsic :: iso_fortran_env
     implicit none
-    
+    private
+    public:: merge_sort
 contains
-    subroutine double_merge_sort(ar1, ar2)
-        integer(int64),intent(inout):: ar1(:), ar2(:)
-        integer(int64):: tmp1(size(ar1)),tmp2(size(ar2))
-        integer(int32):: i, n, d, hd
+    subroutine merge_sort(ar, id)
+        integer(int64),intent(inout):: ar(:), id(:)
+        integer(int64):: tmp(size(ar)), idtmp(size(id))
 
-        n = size(ar1)
-        do i=1,n-1,2
-            if (ar1(i+1) < ar1(i))then 
-                call swap(ar1(i), ar1(i+1))
-                call swap(ar2(i), ar2(i+1))
-            end if
-        end do
-        hd=2
-        d=4
-        do while(hd < n)
-            do i=1,n-d,d
-                call merge_sub(ar1(i:i+d-1), ar2(i:i+d-1), tmp1, tmp2, hd, hd+1, d)
-            end do
-            i = ((n+d-1)/d-1)*d+1
-            if (i+hd <= n) then
-                call merge_sub(ar1(i:), ar2(i:), tmp1, tmp2, hd, hd+1, n-i+1) 
-            end if
-            hd=d
-            d=d*2
-        end do
+        call merge_sort_sub(1_int64, size(ar,kind=int64), ar, tmp, id, idtmp)
     end subroutine
 
+    recursive subroutine merge_sort_sub(l, r, ar, tmp, id, idtmp)
+        integer(int64),intent(in):: l, r
+        integer(int64),intent(inout):: ar(:), tmp(:), id(:), idtmp(:)
+        integer(int64):: m
 
-    subroutine merge_sub(ar1, ar2, tmp1, tmp2, n1, i2, n2)
-        integer(int64),intent(inout):: ar1(:), tmp1(:), ar2(:), tmp2(:)
-        integer(int32),value:: n1, i2, n2
-        integer(int32):: i,i1
-        
-        i1=1
-        tmp1(i1:n1) = ar1(i1:n1)
-        tmp2(i1:n1) = ar2(i1:n1)
-        do i=1,n2
-            if (n1 < i1) then
-                return
-            else if (n2 < i2) then
-                ar1(i:)=tmp1(i1:n1)
-                ar2(i:)=tmp2(i1:n1)
-                return
+        if (r-l <= 1) then
+            if (ar(l) > ar(r)) then
+                m = ar(l)
+                ar(l) = ar(r)
+                ar(r) = m
+                m = id(l)
+                id(l) = id(r)
+                id(r) = m
+            end if
+        else
+            m = (l+r) / 2
+            call merge_sort_sub(l, m ,ar, tmp, id, idtmp)
+            call merge_sort_sub(m+1, r, ar, tmp, id, idtmp)
+            call merge_sub(l, m, r, ar, tmp, id, idtmp)
+        end if
+    end subroutine
+
+    subroutine merge_sub(l, n1, n2, ar, tmp, id, idtmp)
+        integer(int64), intent(in):: l, n1, n2
+        integer(int64), intent(inout):: ar(:), tmp(:), id(:), idtmp(:)
+        integer(int64):: i1, i2, it, nt
+
+        i1 = l
+        i2 = n1+1
+        it = 1
+        nt = n2-l+1
+
+        do while(i1 <= n1 .and. i2 <= n2)
+            if (ar(i1) <= ar(i2)) then
+                tmp(it) = ar(i1)
+                idtmp(it) = id(i1)
+                i1=i1+1
             else
-                if (ar1(i2) <= tmp1(i1)) then
-                    ar1(i) = ar1(i2)
-                    ar2(i) = ar2(i2)
-                    i2=i2+1
-                else
-                    ar1(i) = tmp1(i1)
-                    ar2(i) = tmp2(i1)
-                    i1=i1+1
-                end if
+                tmp(it) = ar(i2)
+                idtmp(it) = id(i1)
+                i2=i2+1
             end if
+            it=it+1
         end do
+
+        if (i1 <= n1) then
+            tmp(it:nt) = ar(i1:n1)
+            idtmp(it:nt) = id(i1:n1)
+        else if (i2 <= n2) then
+            tmp(it:nt) = ar(i2:n2)
+            idtmp(it:nt) = id(i2:n2)
+        end if
+        ar(l:n2) = tmp(1:nt)
+        id(l:n2) = idtmp(1:nt)
     end subroutine
-
-
-    subroutine swap(x, y)
-        integer(int64),intent(inout):: x, y
-        integer(int64):: t1, t2
-
-            t1 = x
-            t2 = y
-            x = t2
-            y = t1
-    end subroutine
-end module double_merge_sort_int64
-
+end module
 
 
 module double_merge_sort_char
     use,intrinsic :: iso_fortran_env
     implicit none
+    private
+    public:: merge_sort
 contains
-    subroutine double_merge_sort(ar1, ar2)
-        character(*),intent(inout):: ar1(:)
-        integer(int32),intent(inout):: ar2(:)
-        character(:),allocatable:: tmp1(:)
-        integer(int32),allocatable:: tmp2(:)
-        integer(int32):: i, n, d, hd
-
-        allocate(tmp1, mold=ar1)
-        allocate(tmp2, mold=ar2)
-        n = size(ar1)
-        do i=1,n-1,2
-            if (ar1(i+1) < ar1(i))then 
-                call swap_char(ar1(i), ar1(i+1))
-                call swap_int(ar2(i), ar2(i+1))
-            end if
-        end do
-        hd=2
-        d=4
-        do while(hd < n)
-            do i=1,n-d,d
-                call merge_sub(ar1(i:i+d-1), ar2(i:i+d-1), tmp1, tmp2, hd, hd+1, d)
-            end do
-            i = ((n+d-1)/d-1)*d+1
-            if (i+hd <= n) then
-                call merge_sub(ar1(i:), ar2(i:), tmp1, tmp2, hd, hd+1, n-i+1) 
-            end if
-            hd=d
-            d=d*2
-        end do
-    end subroutine
-
-
-    subroutine merge_sub(ar1, ar2, tmp1, tmp2, n1, i2, n2)
-        character(*),intent(inout):: ar1(:), tmp1(:)
-        integer(int32),intent(inout):: ar2(:), tmp2(:)
-        integer(int32),value:: n1, i2, n2
-        integer(int32):: i,i1
+    subroutine merge_sort(ar, id)
+        character(*),intent(inout):: ar(:)
+        integer(int32), intent(inout):: id(:)
+        character(len(ar(1))):: tmp(size(ar))
+        integer(int32):: idtmp(size(id))
         
-        i1=1
-        tmp1(i1:n1) = ar1(i1:n1)
-        tmp2(i1:n1) = ar2(i1:n1)
-        do i=1,n2
-            if (n1 < i1) then
-                return
-            else if (n2 < i2) then
-                ar1(i:)=tmp1(i1:n1)
-                ar2(i:)=tmp2(i1:n1)
-                return
-            else
-                if (ar1(i2) <= tmp1(i1)) then
-                    ar1(i) = ar1(i2)
-                    ar2(i) = ar2(i2)
-                    i2=i2+1
-                else
-                    ar1(i) = tmp1(i1)
-                    ar2(i) = tmp2(i1)
-                    i1=i1+1
-                end if
+
+        call merge_sort_sub(1_int32, size(ar,kind=int32), ar, tmp, id, idtmp)
+    end subroutine
+
+    recursive subroutine merge_sort_sub(l, r, ar, tmp, id, idtmp)
+        integer(int32),intent(in):: l, r
+        character(*),intent(inout):: ar(:), tmp(:)
+        integer(int32),intent(inout):: id(:), idtmp(:)
+        integer(int32):: m
+        character(len(ar(1))):: c
+
+        if (r-l <= 1) then
+            if (ar(l) > ar(r)) then
+                c = ar(l)
+                ar(l) = ar(r)
+                ar(r) = c
+                m = id(l)
+                id(l) = id(r)
+                id(r) = m
             end if
+        else
+            m = (l+r) / 2
+            call merge_sort_sub(l, m ,ar, tmp, id, idtmp)
+            call merge_sort_sub(m+1, r, ar, tmp, id, idtmp)
+            call merge_sub(l, m, r, ar, tmp, id, idtmp)
+        end if
+    end subroutine
+
+    subroutine merge_sub(l, n1, n2, ar, tmp, id, idtmp)
+        integer(int32), intent(in):: l, n1, n2
+        character(*), intent(inout):: ar(:), tmp(:)
+        integer(int32), intent(inout):: id(:), idtmp(:)
+        integer(int32):: i1, i2, it, nt
+
+        i1 = l
+        i2 = n1+1
+        it = 1
+        nt = n2-l+1
+
+        do while(i1 <= n1 .and. i2 <= n2)
+            if (ar(i1) <= ar(i2)) then
+                tmp(it) = ar(i1)
+                idtmp(it) = id(i1)
+                i1=i1+1
+            else
+                tmp(it) = ar(i2)
+                idtmp(it) = id(i2)
+                i2=i2+1
+            end if
+            it=it+1
         end do
+
+        if (i1 <= n1) then
+            tmp(it:nt) = ar(i1:n1)
+            idtmp(it:nt) = id(i1:n1)
+        else if (i2 <= n2) then
+            tmp(it:nt) = ar(i2:n2)
+            idtmp(it:nt) = id(i2:n2)
+        end if
+        ar(l:n2) = tmp(1:nt)
+        id(l:n2) = idtmp(1:nt)
     end subroutine
-
-
-    subroutine swap_char(x, y)
-        character(*),intent(inout):: x, y
-        character(:),allocatable:: t1, t2
-
-            t1 = x
-            t2 = y
-            x = t2
-            y = t1
-    end subroutine
-
-
-    subroutine swap_int(x, y)
-        integer(int32),intent(inout):: x, y
-        integer(int32):: t1, t2
-
-            t1 = x
-            t2 = y
-            x = t2
-            y = t1
-    end subroutine
-end module double_merge_sort_char
-
+end module
 
 
 module double_merge_sort_mod
     use,intrinsic :: iso_fortran_env
-    use double_merge_sort_int32, dms32 => double_merge_sort
-    use double_merge_sort_int64, dms64 => double_merge_sort
-    use double_merge_sort_char,  dmsch => double_merge_sort
-    interface double_merge_sort
-        module procedure dms32, dms64, dmsch
+    use double_merge_sort_int32, ms32 => merge_sort
+    use double_merge_sort_int64, ms64 => merge_sort
+    use double_merge_sort_char,  msch => merge_sort
+    interface merge_sort
+        module procedure ms32, ms64, msch
     end interface
 end module
