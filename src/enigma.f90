@@ -427,7 +427,7 @@ contains
         
         encrypting_data(num_encrypting_phase) = em%pb%pass_reverse_order(encrypting_data(num_encrypting_phase-1))
         
-        print'("!!! ENCRYPTING DATA:: ", *(i3.2))', encrypting_data
+        ! print'("!!! ENCRYPTING DATA:: ", *(i3.2))', encrypting_data
         encrypted_c = int_to_char(encrypting_data(num_encrypting_phase))
         ! rotate rotors
         one_turned = em%rotors(1)%rotate(1)

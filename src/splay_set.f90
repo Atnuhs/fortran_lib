@@ -582,3 +582,22 @@ contains
         call ssn_print_tree(ss%root, 0_int64, 0_int64)
     end subroutine 
 end module
+
+
+program main
+    use,intrinsic :: iso_fortran_env
+    use splay_set_mod
+    implicit none
+    type(splay_set):: s
+    integer(int64):: i, n
+    
+    n = 10
+
+    do i=0,20,2
+    print*, repeat("=", 50)
+        call s%insert(i)
+        print*, s%le(10_int64)
+    call s%print()
+    end do
+    
+end program main
